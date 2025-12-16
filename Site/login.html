@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Вход - Самолетни билети</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f7f6; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .auth-card { background: white; padding: 2rem; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); width: 100%; max-width: 400px; }
+        h2 { text-align: center; color: #333; }
+        input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box; }
+        button { width: 100%; padding: 12px; background-color: #28a745; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; margin-top: 10px; }
+        button:hover { background-color: #218838; }
+        .link { text-align: center; margin-top: 15px; font-size: 14px; }
+        .link a { color: #007bff; text-decoration: none; }
+    </style>
+</head>
+<body>
+
+    <div class="auth-card">
+        <h2>Вход в системата</h2>
+        <input type="email" id="login-email" placeholder="Имейл адрес">
+        <input type="password" id="login-pass" placeholder="Парола">
+        <button id="btn-login">Влез</button>
+        
+        <div class="link">
+            Нямаш профил? <a href="register.html">Регистрирай се тук</a>
+        </div>
+    </div>
+
+    <script type="module">
+        // 1. Вземаме настройките от твоя файл
+        import { auth } from './firebase-config.js';
+        
+        // 2. Вземаме функцията за вход от Firebase
+        import { signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-auth.js";
+
+        document.getElementById('btn-login').addEventListener('click', async () => {
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-pass').value;
+
+            try {
+                // Опит за вход
+                await signInWithEmailAndPassword(auth, email, password);
+                
+                alert("Успешен вход!");
+                // Тук ще пренасочим към началната страница
+                window.location.href = "index.html"; 
+            } catch (error) {
+                alert("Грешка при вход: Проверете имейла и паролата!");
+                console.error(error.message);
+            }
+        });
+    </script>
+</body>
+</html>

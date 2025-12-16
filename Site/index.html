@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SkyTickets - Начало</title>
+    <style>
+        :root { --primary: #007bff; --success: #28a745; --bg: #f8f9fa; --dark: #333; }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background-color: var(--bg); margin: 0; color: var(--dark); }
+        
+        /* НАВИГАЦИЯ - ОПРАВЕНА */
+        nav { 
+            background: white; 
+            padding: 15px 5%; 
+            display: flex; 
+            justify-content: space-between; /* Лого вляво, линкове вдясно */
+            align-items: center; 
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1); 
+            position: sticky;
+            top: 0; 
+            z-index: 1000; 
+        }
+        .logo { font-size: 26px; font-weight: bold; color: var(--primary); text-decoration: none; flex-shrink: 0; }
+        
+        .nav-links { display: flex; align-items: center; gap: 20px; }
+        .nav-links a { text-decoration: none; color: var(--dark); font-weight: 500; transition: 0.3s; }
+        .nav-links a:hover { color: var(--primary); }
+        
+        #admin-btn { display: none; background: #333; color: white; padding: 8px 12px; border-radius: 5px; font-size: 14px; }
+        .btn-logout { background: #ff4757; color: white; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; display: none; }
+
+        /* HERO СЕКЦИЯ */
+        .hero { background: linear-gradient(rgba(0,123,255,0.8), rgba(0,86,179,0.8)), url('https://images.unsplash.com/photo-1436491865332-7a61a109c0f2?auto=format&fit=crop&w=1350&q=80'); 
+                background-size: cover; background-position: center; color: white; padding: 60px 20px; text-align: center; }
+
+        /* КОНТЕЙНЕР И ТЪРСАЧКА */
+        .container { max-width: 900px; margin: -30px auto 40px; padding: 0 20px; }
+        .search-box { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); display: flex; gap: 10px; }
+        .search-box input { flex: 1; padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 16px; outline: none; }
+        .search-box button { background: var(--primary); color: white; border: none; padding: 0 25px; border-radius: 8px; cursor: pointer; font-weight: bold; }
+
+        /* КАРТИЧКИ НА ПОЛЕТИ */
+        .flight-card { background: white; padding: 20px; border-radius: 12px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; 
+                       box-shadow: 0 4px 6px rgba(0,0,0,0.05); border-left: 5px solid var(--primary); }
+        .flight-info h3 { margin: 0; font-size: 20px; }
+        .flight-details { color: #777; font-size: 14px; margin-top: 5px; }
+        .price-tag { font-size: 22px; font-weight: bold; color: var(--primary); }
+        .buy-btn { background: var(--success); color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: bold; margin-top: 5px; }
+        .buy-btn:disabled { background: #ccc; cursor: not-allowed; }
+    </style>
+</head>
+<body>
+
+<nav>
+    <a href="index.html" class="logo">SkyTickets ✈️</a>
+    
+    <div class="nav-links">
+        <a href="my-tickets.html">Моите Билети 🎫</a>
+        <a href="admin.html" id="admin-btn">Админ</a>
+        <span id="user-display"></span>
+        <button id="btn-logout" class="btn-logout">Изход</button>
+    </div>
+</nav>
+
+<div class="hero">
+    <h1>Къде ще летим днес?</h1>
+    <p>Намери най-добрите цени за твоята почивка</p>
+</div>
+
+<div class="container">
+    <div class="search-box">
+        <input type="text" id="search-to" placeholder="Въведете дестинация (напр. Париж)...">
+        <button id="btn-search">Търси</button>
+    </div>
+
+    <div id="flights-list" style="margin-top: 30px;">
+        </div>
+</div>
+
+<script type="module">
+    import { auth, db } from './firebase-config.js';
+    import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-auth.js";
+    import { collection, getDocs, doc, updateDoc, getDoc, query, where, addDoc } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-firestore.js";
+
+    const flightsList = document.getElementById('flights-list');
+    const searchInput = document.getElementById('search-to');
+
+    // 1. ФУНКЦИЯ ЗА ПОКАЗВАНЕ С ТЪРСАЧКА
+    async function displayFlights(filterCity = "") {
+        flightsList.innerHTML = "<p style='text-align:center;'>Зареждане...</p>";
+        let q = collection(db, "flights");
+        
+        if (filterCity.trim() !== "") {
+            q = query(collection(db, "flights"), where("to", "==", filterCity.trim()));
+        }
+
+        const querySnapshot = await getDocs(q);
+        flightsList.innerHTML = ""; 
+
+        if (querySnapshot.empty) {
+            flightsList.innerHTML = "<div style='text-align:center; background:white; padding:20px; border-radius:12px;'>Няма намерени полети.</div>";
+            return;
+        }
+
+        querySnapshot.forEach((flightDoc) => {
+            const flight = flightDoc.data();
+            const id = flightDoc.id;
+            const isSoldOut = flight.seats <= 0;
+            
+            flightsList.innerHTML += `
+                <div class="flight-card">
+                    <div class="flight-info">
+                        <h3>${flight.from} ➔ ${flight.to}</h3>
+                        <div class="flight-details">📅 ${flight.date} | 💺 Свободни места: ${flight.seats}</div>
+                    </div>
+                    <div style="text-align: right;">
+                        <div class="price-tag">${flight.price} лв.</div>
+                        <button onclick="buyTicket('${id}')" class="buy-btn" ${isSoldOut ? 'disabled' : ''}>
+                            ${isSoldOut ? 'Изчерпан' : 'Купи Билет'}
+                        </button>
+                    </div>
+                </div>`;
+        });
+    }
+
+    // 2. ФУНКЦИЯ ЗА КУПУВАНЕ
+    window.buyTicket = async (flightId) => {
+        const user = auth.currentUser;
+        if (!user) { alert("Моля, влезте в профила си!"); return; }
+
+        const flightRef = doc(db, "flights", flightId);
+        const flightSnap = await getDoc(flightRef);
+        const flightData = flightSnap.data();
+
+        if (flightData.seats > 0) {
+            try {
+                await updateDoc(flightRef, { seats: flightData.seats - 1 });
+                await addDoc(collection(db, "orders"), {
+                    userId: user.uid,
+                    userEmail: user.email,
+                    flightTo: flightData.to,
+                    flightFrom: flightData.from,
+                    date: flightData.date,
+                    price: flightData.price,
+                    purchaseDate: new Date().toLocaleDateString()
+                });
+                alert("Успешна резервация!");
+                displayFlights(searchInput.value);
+            } catch (e) { alert("Грешка при покупка."); }
+        }
+    };
+
+    // 3. СЪБИТИЯ
+    document.getElementById('btn-search').onclick = () => displayFlights(searchInput.value);
+
+    onAuthStateChanged(auth, async (user) => {
+        const userDisplay = document.getElementById('user-display');
+        const logoutBtn = document.getElementById('btn-logout');
+        const adminBtn = document.getElementById('admin-btn');
+
+        if (user) {
+            userDisplay.innerText = "👤 " + user.email;
+            logoutBtn.style.display = "inline-block";
+            
+            // Проверка за админ
+            const userDoc = await getDoc(doc(db, "users", user.uid));
+            if (userDoc.exists() && userDoc.data().role === "admin") {
+                adminBtn.style.display = "inline-block";
+            }
+        } else {
+            userDisplay.innerHTML = '<a href="login.html">Вход / Регистрация</a>';
+            logoutBtn.style.display = "none";
+            adminBtn.style.display = "none";
+        }
+        displayFlights();
+    });
+
+    document.getElementById('btn-logout').onclick = () => signOut(auth).then(() => location.reload());
+</script>
+
+</body>
+</html>

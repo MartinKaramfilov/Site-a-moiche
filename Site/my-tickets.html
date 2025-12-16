@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+    <meta charset="UTF-8">
+    <title>Моите Билети - SkyTickets</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; margin: 0; padding: 20px; }
+        .container { max-width: 800px; margin: auto; }
+        .ticket { background: white; padding: 20px; border-radius: 10px; margin-bottom: 15px; border-left: 8px solid #28a745; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        h2 { color: #333; }
+        .nav-back { margin-bottom: 20px; display: inline-block; text-decoration: none; color: #007bff; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="index.html" class="nav-back">← Назад към полетите</a>
+        <h2>Вашите резервирани билети 🎫</h2>
+        <div id="my-tickets-list">Зареждане...</div>
+    </div>
+
+    <script type="module">
+        import { auth, db } from './firebase-config.js';
+        import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-auth.js";
+        import { collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-firestore.js";
+
+        const ticketsList = document.getElementById('my-tickets-list');
+
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                // Вземаме само поръчките на този потребител
+                const q = query(collection(db, "orders"), where("userId", "==", user.uid));
+                const querySnapshot = await getDocs(q);
+                
+                ticketsList.innerHTML = "";
+                if (querySnapshot.empty) {
+                    ticketsList.innerHTML = "<p>Все още нямате купени билети.</p>";
+                    return;
+                }
+
+                querySnapshot.forEach((doc) => {
+                    const ticket = doc.data();
+                    ticketsList.innerHTML += `
+                        <div class="ticket">
+                            <div style="font-size: 1.2rem; font-weight: bold;">${ticket.flightFrom} ➔ ${ticket.flightTo}</div>
+                            <div style="color: #666;">Дата на полета: ${ticket.date}</div>
+                            <div style="margin-top: 10px; font-size: 0.9rem; color: #888;">Купен на: ${ticket.purchaseDate} | Цена: ${ticket.price} лв.</div>
+                        </div>
+                    `;
+                });
+            } else {
+                window.location.href = "login.html";
+            }
+        });
+    </script>
+</body>
+</html>

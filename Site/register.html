@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Регистрация - Самолетни билети</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f7f6; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .auth-card { background: white; padding: 2rem; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); width: 100%; max-width: 400px; }
+        h2 { text-align: center; color: #333; }
+        input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box; }
+        button { width: 100%; padding: 12px; background-color: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; margin-top: 10px; }
+        button:hover { background-color: #0056b3; }
+        .link { text-align: center; margin-top: 15px; font-size: 14px; }
+        .link a { color: #007bff; text-decoration: none; }
+    </style>
+</head>
+<body>
+
+    <div class="auth-card">
+        <h2>Създай профил</h2>
+        <input type="email" id="reg-email" placeholder="Имейл адрес">
+        <input type="password" id="reg-pass" placeholder="Парола (минимум 6 символа)">
+        <button id="btn-register">Регистрирай ме</button>
+        
+        <div class="link">
+            Вече имаш профил? <a href="login.html">Влез тук</a>
+        </div>
+    </div>
+
+    <script type="module">
+        // 1. Импортираме твоите настройки
+        import { auth, db } from './firebase-config.js';
+        
+        // 2. Импортираме нужните функции от библиотеката на Firebase
+        import { createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-auth.js";
+        import { doc, setDoc } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-firestore.js";
+
+        // 3. Хващаме бутона и добавяме събитие
+        document.getElementById('btn-register').addEventListener('click', async () => {
+            const email = document.getElementById('reg-email').value;
+            const password = document.getElementById('reg-pass').value;
+
+            if (email === "" || password === "") {
+                alert("Моля, попълнете всички полета!");
+                return;
+            }
+
+            try {
+                // А) Създаваме потребителя в Authentication частта
+                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                const user = userCredential.user;
+
+                // Б) Записваме ролята му в базата данни (Firestore)
+                // Създаваме документ в колекция "users" с ID същото като на потребителя
+                await setDoc(doc(db, "users", user.uid), {
+                    email: email,
+                    role: "user", // Всички нови са обикновени потребители
+                    createdAt: new Date()
+                });
+
+                alert("Успешна регистрация!");
+                window.location.href = "index.html"; // Препращаме към началната страница
+
+            } catch (error) {
+                console.error("Грешка:", error);
+                alert("Грешка при регистрация: " + error.message);
+            }
+        });
+    </script>
+</body>
+</html>
