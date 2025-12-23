@@ -1,69 +1,126 @@
+Това е много полезно допълнение, защото един админ трябва не само да добавя, но и да може да премахва полети (например ако полетът е отменен или приключил).
+
+Ще обновим admin.html, така че под формата за добавяне да се появи списък с всички съществуващи полети и червен бутон „Изтрий“ до всеки от тях.
+
+Обновен код за admin.html
+Замени всичко в твоя файл admin.html с този код:
+
+HTML
+
 <!DOCTYPE html>
 <html lang="bg">
 <head>
     <meta charset="UTF-8">
     <title>Админ Панел - SkyTickets</title>
     <style>
-        body { font-family: 'Segoe UI', sans-serif; background: #f4f7f6; padding: 40px; }
-        .admin-box { max-width: 500px; margin: auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 5px 20px rgba(0,0,0,0.1); }
+        body { font-family: 'Segoe UI', sans-serif; background: #f4f7f6; padding: 20px; }
+        .admin-box { max-width: 600px; margin: 20px auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 5px 20px rgba(0,0,0,0.1); }
         h2 { text-align: center; color: #333; }
         input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; }
         .btn-add { width: 100%; padding: 12px; background: #007bff; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 16px; margin-top: 10px; }
-        .btn-add:hover { background: #0056b3; }
+        
+        /* Стил за списъка с полети */
+        .flights-table { width: 100%; border-collapse: collapse; margin-top: 30px; background: white; border-radius: 8px; overflow: hidden; }
+        .flights-table th, .flights-table td { padding: 12px; text-align: left; border-bottom: 1px solid #eee; }
+        .flights-table th { background: #f8f9fa; }
+        .btn-delete { background: #ff4757; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; }
+        .btn-delete:hover { background: #ff1f36; }
         .back-link { display: block; text-align: center; margin-top: 20px; color: #666; text-decoration: none; }
     </style>
 </head>
 <body>
 
     <div class="admin-box">
-        <h2>Добави нов полет ✈️</h2>
+        <h2>Управление на полети ✈️</h2>
+        
         <input type="text" id="from" placeholder="От (град)">
         <input type="text" id="to" placeholder="До (град)">
         <input type="date" id="date">
         <input type="number" id="price" placeholder="Цена (лв)">
         <input type="number" id="seats" placeholder="Брой места">
-        <button id="btn-save" class="btn-add">Запази полет</button>
+        <button id="btn-save" class="btn-add">Добави нов полет</button>
+
+        <table class="flights-table">
+            <thead>
+                <tr>
+                    <th>Полет</th>
+                    <th>Дата</th>
+                    <th>Действие</th>
+                </tr>
+            </thead>
+            <tbody id="admin-flights-list">
+                </tbody>
+        </table>
         
-        <a href="index.html" class="back-link">← Към началната страница</a>
+        <a href="index.html" class="back-link">← Обратно към сайта</a>
     </div>
 
     <script type="module">
         import { db } from './firebase-config.js';
-        import { collection, addDoc } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-firestore.js";
+        import { collection, addDoc, getDocs, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-firestore.js";
 
+        const flightsContainer = document.getElementById('admin-flights-list');
+
+        // 1. ФУНКЦИЯ ЗА ЗАРЕЖДАНЕ НА ПОЛЕТИТЕ
+        async function loadFlightsForAdmin() {
+            flightsContainer.innerHTML = "<tr><td colspan='3'>Зареждане...</td></tr>";
+            const querySnapshot = await getDocs(collection(db, "flights"));
+            flightsContainer.innerHTML = "";
+
+            querySnapshot.forEach((flightDoc) => {
+                const flight = flightDoc.data();
+                const id = flightDoc.id;
+
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${flight.from} - ${flight.to}</td>
+                    <td>${flight.date}</td>
+                    <td><button class="btn-delete" data-id="${id}">Изтрий</button></td>
+                `;
+                flightsContainer.appendChild(row);
+            });
+
+            // Добавяне на събитие за всеки бутон "Изтрий"
+            document.querySelectorAll('.btn-delete').forEach(button => {
+                button.onclick = async (e) => {
+                    const flightId = e.target.getAttribute('data-id');
+                    if(confirm("Сигурни ли сте, че искате да изтриете този полет?")) {
+                        await deleteDoc(doc(db, "flights", flightId));
+                        alert("Полетът е изтрит!");
+                        loadFlightsForAdmin(); // Презареждаме списъка
+                    }
+                };
+            });
+        }
+
+        // 2. ЗАПИСВАНЕ НА НОВ ПОЛЕТ
         document.getElementById('btn-save').onclick = async () => {
-            // 1. Вземаме стойностите от полетата
-            const fromCity = document.getElementById('from').value;
-            const toCity = document.getElementById('to').value;
-            const flightDate = document.getElementById('date').value;
-            const flightPrice = document.getElementById('price').value;
-            const flightSeats = document.getElementById('seats').value;
+            const data = {
+                from: document.getElementById('from').value,
+                to: document.getElementById('to').value,
+                date: document.getElementById('date').value,
+                price: Number(document.getElementById('price').value),
+                seats: Number(document.getElementById('seats').value)
+            };
 
-            // Проверка за празни полета
-            if(!fromCity || !toCity || !flightDate || !flightPrice || !flightSeats) {
-                alert("Моля, попълнете всички полета!");
+            if(!data.from || !data.to || !data.date) {
+                alert("Попълнете всички полета!");
                 return;
             }
 
             try {
-                // 2. Изпращаме данните към Firebase
-                await addDoc(collection(db, "flights"), {
-                    from: fromCity,
-                    to: toCity,
-                    date: flightDate,
-                    price: Number(flightPrice),
-                    seats: Number(flightSeats)
-                });
-
+                await addDoc(collection(db, "flights"), data);
                 alert("Полетът е добавен успешно!");
-                
-                // 3. Изчистваме полетата за следващия запис
+                // Изчистване на полетата
                 document.querySelectorAll('input').forEach(i => i.value = "");
-                
+                loadFlightsForAdmin(); // Обновяваме списъка веднага
             } catch (error) {
-                alert("Грешка при запис: " + error.message);
+                alert("Грешка: " + error.message);
             }
         };
+
+        // Първоначално зареждане
+        loadFlightsForAdmin();
     </script>
 </body>
 </html>
