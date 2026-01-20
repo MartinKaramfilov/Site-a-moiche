@@ -3,93 +3,160 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SkyTickets - Начало</title>
+    <title>SkyTickets | Modern Travel</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
-        :root { --primary: #007bff; --success: #28a745; --bg: #f8f9fa; --dark: #333; }
-        body { font-family: 'Segoe UI', Tahoma, sans-serif; background-color: var(--bg); margin: 0; color: var(--dark); }
-        
-        /* НАВИГАЦИЯ - ОПРАВЕНА */
-        nav { 
-            background: white; 
-            padding: 15px 5%; 
-            display: flex; 
-            justify-content: space-between; /* Лого вляво, линкове вдясно */
-            align-items: center; 
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1); 
-            position: sticky;
-            top: 0; 
-            z-index: 1000; 
+        /* MIDNIGHT TECH DESIGN */
+        :root {
+            --bg-deep: #0a0e17;      /* Дълбоко синьо (почти черно) */
+            --bg-card: #161c28;      /* По-светло синьо за картичките */
+            --accent: #007aff;       /* Електриково синьо */
+            --accent-glow: rgba(0, 122, 255, 0.3);
+            --text-main: #ffffff;
+            --text-dim: #94a3b8;
         }
-        .logo { font-size: 26px; font-weight: bold; color: var(--primary); text-decoration: none; flex-shrink: 0; }
+
+        body { 
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg-deep); 
+            margin: 0; 
+            color: var(--text-main);
+            overflow-x: hidden;
+        }
+
+        /* NAVIGATION */
+        nav { 
+            background: rgba(10, 14, 23, 0.8);
+            backdrop-filter: blur(12px);
+            padding: 0 6%; 
+            height: 75px;
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            position: sticky; top: 0; z-index: 1000;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+        .logo { 
+            font-size: 22px; font-weight: 800; color: var(--text-main); 
+            text-decoration: none; letter-spacing: -0.5px;
+        }
+        .logo span { color: var(--accent); }
+
+        .nav-links { display: flex; gap: 25px; align-items: center; }
+        .nav-links a { 
+            text-decoration: none; color: var(--text-dim); 
+            font-size: 14px; font-weight: 600; transition: 0.3s;
+        }
+        .nav-links a:hover { color: var(--accent); }
+
+        #admin-btn { 
+            background: var(--accent); color: white !important; 
+            padding: 8px 18px; border-radius: 10px; box-shadow: 0 4px 15px var(--accent-glow);
+        }
+
+        /* HERO */
+        .hero { 
+            padding: 100px 20px 140px; text-align: center;
+            background: radial-gradient(circle at top, #1e293b 0%, #0a0e17 70%);
+        }
+        .hero h1 { font-size: 52px; margin: 0; font-weight: 800; letter-spacing: -1.5px; }
+        .hero p { color: var(--text-dim); font-size: 18px; margin-top: 15px; }
+
+        /* SEARCH BOX */
+        .container { max-width: 900px; margin: -70px auto 80px; padding: 0 20px; }
+        .search-box { 
+            background: var(--bg-card); padding: 20px; border-radius: 20px; 
+            display: flex; gap: 15px; border: 1px solid rgba(255,255,255,0.05);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+        }
+        .search-box input { 
+            flex: 1; background: #0a0e17; border: 1px solid #2d3748; 
+            padding: 15px 20px; border-radius: 12px; color: white; outline: none;
+        }
+        .search-box button { 
+            background: var(--accent); color: white; border: none; 
+            padding: 0 30px; border-radius: 12px; font-weight: 700; cursor: pointer;
+        }
+
+        /* FLIGHT CARDS */
+        .flight-card { 
+            background: var(--bg-card); padding: 30px; border-radius: 20px; 
+            margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center;
+            border: 1px solid rgba(255,255,255,0.03); transition: 0.3s;
+        }
+        .flight-card:hover { 
+            transform: translateY(-5px); 
+            border-color: var(--accent);
+            box-shadow: 0 10px 30px rgba(0, 122, 255, 0.1);
+        }
         
-        .nav-links { display: flex; align-items: center; gap: 20px; }
-        .nav-links a { text-decoration: none; color: var(--dark); font-weight: 500; transition: 0.3s; }
-        .nav-links a:hover { color: var(--primary); }
+        .flight-info h3 { margin: 0; font-size: 24px; }
+        .flight-info span { color: var(--accent); }
+        .flight-details { color: var(--text-dim); margin-top: 10px; font-size: 14px; }
         
-        #admin-btn { display: none; background: #333; color: white; padding: 8px 12px; border-radius: 5px; font-size: 14px; }
-        .btn-logout { background: #ff4757; color: white; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; display: none; }
+        .price-tag { font-size: 32px; font-weight: 800; color: var(--text-main); }
+        
+        .buy-btn { 
+            background: var(--accent); color: white; border: none; 
+            padding: 12px 28px; border-radius: 12px; font-weight: 700; cursor: pointer;
+            transition: 0.3s; margin-top: 10px; width: 100%;
+        }
+        .buy-btn:hover { filter: brightness(1.2); }
+        .buy-btn:disabled { background: #2d3748; color: #4a5568; cursor: not-allowed; }
 
-        /* HERO СЕКЦИЯ */
-        .hero { background: linear-gradient(rgba(0,123,255,0.8), rgba(0,86,179,0.8)), url('https://images.unsplash.com/photo-1436491865332-7a61a109c0f2?auto=format&fit=crop&w=1350&q=80'); 
-                background-size: cover; background-position: center; color: white; padding: 60px 20px; text-align: center; }
-
-        /* КОНТЕЙНЕР И ТЪРСАЧКА */
-        .container { max-width: 900px; margin: -30px auto 40px; padding: 0 20px; }
-        .search-box { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); display: flex; gap: 10px; }
-        .search-box input { flex: 1; padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 16px; outline: none; }
-        .search-box button { background: var(--primary); color: white; border: none; padding: 0 25px; border-radius: 8px; cursor: pointer; font-weight: bold; }
-
-        /* КАРТИЧКИ НА ПОЛЕТИ */
-        .flight-card { background: white; padding: 20px; border-radius: 12px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; 
-                       box-shadow: 0 4px 6px rgba(0,0,0,0.05); border-left: 5px solid var(--primary); }
-        .flight-info h3 { margin: 0; font-size: 20px; }
-        .flight-details { color: #777; font-size: 14px; margin-top: 5px; }
-        .price-tag { font-size: 22px; font-weight: bold; color: var(--primary); }
-        .buy-btn { background: var(--success); color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: bold; margin-top: 5px; }
-        .buy-btn:disabled { background: #ccc; cursor: not-allowed; }
+        .btn-logout { background: #ef4444; color: white; border: none; padding: 8px 15px; border-radius: 8px; cursor: pointer; }
     </style>
 </head>
 <body>
 
 <nav>
-    <a href="index.html" class="logo">SkyTickets ✈️</a>
-    
+    <a href="index.html" class="logo">Sky<span>Tickets</span></a>
     <div class="nav-links">
-        <a href="my-tickets.html">Моите Билети 🎫</a>
-        <a href="admin.html" id="admin-btn">Админ</a>
-        <span id="user-display"></span>
-        <button id="btn-logout" class="btn-logout">Изход</button>
+        <a href="aboutus.html">За нас</a>
+        <a href="contacts.html">Контакти</a>
+        <a href="my-tickets.html">Моите билети</a>
+        
+        <a href="admin.html" id="admin-btn" style="display: none;">Админ</a>
+        <span id="user-display" style="font-size: 14px; font-weight: 600; color: #2563eb;"></span>
+        <button id="btn-logout" class="btn-logout" style="display: none;">Изход</button>
     </div>
 </nav>
 
 <div class="hero">
-    <h1>Къде ще летим днес?</h1>
-    <p>Намери най-добрите цени за твоята почивка</p>
+    <h1>Резервирайте директни и евтини полети.</h1>
+    <p>Намери най-добрите полети в реално време.</p>
 </div>
 
 <div class="container">
     <div class="search-box">
-        <input type="text" id="search-to" placeholder="Въведете дестинация (напр. Париж)...">
+        <input type="text" id="search-to" placeholder="На Къде Пътувате?">
         <button id="btn-search">Търси</button>
     </div>
 
-    <div id="flights-list" style="margin-top: 30px;">
+    <div id="flights-list" style="margin-top: 50px;">
         </div>
 </div>
-
+<footer style="text-align: center; padding: 40px; border-top: 1px solid #e2e8f0; margin-top: 50px; color: #64748b; font-size: 14px;">
+    <div style="margin-bottom: 10px;">
+        <a href="aboutus.html" style="text-decoration: none; color: #1e293b; margin: 0 10px; font-weight: 600;">За нас</a>
+        <a href="contacts.html" style="text-decoration: none; color: #1e293b; margin: 0 10px; font-weight: 600;">Контакти</a>
+        <a href="my-tickets.html" style="text-decoration: none; color: #1e293b; margin: 0 10px; font-weight: 600;">Моите билети</a>
+    </div>
+    <p>&copy; 2026 SkyTickets.</p>
+</footer>
 <script type="module">
-    import { auth, db } from './firebase-config.js';
+   import { auth, db } from './firebase-config.js';
     import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-auth.js";
-    import { collection, getDocs, doc, updateDoc, getDoc, query, where, addDoc } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-firestore.js";
+    // Тук добавихме deleteDoc:
+    import { collection, getDocs, doc, updateDoc, deleteDoc, getDoc, query, where, addDoc } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-firestore.js";
 
     const flightsList = document.getElementById('flights-list');
     const searchInput = document.getElementById('search-to');
 
-    // 1. ФУНКЦИЯ ЗА ПОКАЗВАНЕ С ТЪРСАЧКА
+    // --- 1. ЗАРЕЖДАНЕ НА ПОЛЕТИ ---
     async function displayFlights(filterCity = "") {
-        flightsList.innerHTML = "<p style='text-align:center;'>Зареждане...</p>";
+        flightsList.innerHTML = "<p style='text-align:center; color: #a5b4fc;'>Търсене на полети...</p>";
         let q = collection(db, "flights");
-        
         if (filterCity.trim() !== "") {
             q = query(collection(db, "flights"), where("to", "==", filterCity.trim()));
         }
@@ -98,77 +165,109 @@
         flightsList.innerHTML = ""; 
 
         if (querySnapshot.empty) {
-            flightsList.innerHTML = "<div style='text-align:center; background:white; padding:20px; border-radius:12px;'>Няма намерени полети.</div>";
+            flightsList.innerHTML = "<div style='text-align:center; padding:40px; color: white;'>Няма намерени полети.</div>";
             return;
         }
 
         querySnapshot.forEach((flightDoc) => {
             const flight = flightDoc.data();
             const id = flightDoc.id;
-            const isSoldOut = flight.seats <= 0;
             
-            flightsList.innerHTML += `
-                <div class="flight-card">
-                    <div class="flight-info">
-                        <h3>${flight.from} ➔ ${flight.to}</h3>
-                        <div class="flight-details">📅 ${flight.date} | 💺 Свободни места: ${flight.seats}</div>
-                    </div>
-                    <div style="text-align: right;">
-                        <div class="price-tag">${flight.price} лв.</div>
-                        <button onclick="buyTicket('${id}')" class="buy-btn" ${isSoldOut ? 'disabled' : ''}>
-                            ${isSoldOut ? 'Изчерпан' : 'Купи Билет'}
-                        </button>
-                    </div>
-                </div>`;
+            // Показваме само ако има места (за всеки случай)
+            if (flight.seats > 0) {
+                flightsList.innerHTML += `
+                    <div class="flight-card">
+                        <div class="flight-info">
+                            <h3>${flight.from} ➔ <span>${flight.to}</span></h3>
+                            <div class="flight-details">
+                                📅 ${flight.date} &nbsp;|&nbsp; 💺 ${flight.seats} места
+                            </div>
+                        </div>
+                        <div>
+                            <div class="price-tag">${flight.price} лв.</div>
+                            <button onclick="buyTicket('${id}')" class="buy-btn">Купи</button>
+                        </div>
+                    </div>`;
+            }
         });
     }
 
-    // 2. ФУНКЦИЯ ЗА КУПУВАНЕ
+    // --- 2. КУПУВАНЕ (С ИЗТРИВАНЕ) ---
     window.buyTicket = async (flightId) => {
         const user = auth.currentUser;
         if (!user) { alert("Моля, влезте в профила си!"); return; }
 
         const flightRef = doc(db, "flights", flightId);
-        const flightSnap = await getDoc(flightRef);
-        const flightData = flightSnap.data();
+        
+        try {
+            const flightSnap = await getDoc(flightRef);
+            
+            if (!flightSnap.exists()) {
+                alert("Този полет вече не съществува!");
+                displayFlights(searchInput.value);
+                return;
+            }
 
-        if (flightData.seats > 0) {
-            try {
-                await updateDoc(flightRef, { seats: flightData.seats - 1 });
+            const flightData = flightSnap.data();
+
+            if (flightData.seats > 0) {
+                const newSeats = flightData.seats - 1;
+
+                // 1. Записваме поръчката
                 await addDoc(collection(db, "orders"), {
                     userId: user.uid,
                     userEmail: user.email,
+                    flightId: flightId,
                     flightTo: flightData.to,
                     flightFrom: flightData.from,
                     date: flightData.date,
                     price: flightData.price,
                     purchaseDate: new Date().toLocaleDateString()
                 });
-                alert("Успешна резервация!");
+
+                // 2. Логика за изтриване
+                if (newSeats <= 0) {
+                    await deleteDoc(flightRef); // ИЗТРИВАМЕ
+                    alert("Вие взехте последния билет!");
+                } else {
+                    await updateDoc(flightRef, { seats: newSeats }); // ОБНОВЯВАМЕ
+                    alert("Успешна резервация!");
+                }
+
                 displayFlights(searchInput.value);
-            } catch (e) { alert("Грешка при покупка."); }
+            } else {
+                alert("Съжаляваме, местата свършиха току-що!");
+                displayFlights(searchInput.value);
+            }
+        } catch (e) { 
+            console.error("Грешка:", e);
+            alert("Възникна грешка. Виж конзолата (F12)."); 
         }
     };
 
-    // 3. СЪБИТИЯ
     document.getElementById('btn-search').onclick = () => displayFlights(searchInput.value);
 
+    // --- 3. АВТЕНТИКАЦИЯ ---
     onAuthStateChanged(auth, async (user) => {
         const userDisplay = document.getElementById('user-display');
         const logoutBtn = document.getElementById('btn-logout');
         const adminBtn = document.getElementById('admin-btn');
 
         if (user) {
-            userDisplay.innerText = "👤 " + user.email;
+            userDisplay.innerText = user.email.split('@')[0];
             logoutBtn.style.display = "inline-block";
-            
-            // Проверка за админ
-            const userDoc = await getDoc(doc(db, "users", user.uid));
-            if (userDoc.exists() && userDoc.data().role === "admin") {
-                adminBtn.style.display = "inline-block";
-            }
+
+            try {
+                const userDoc = await getDoc(doc(db, "users", user.uid));
+                if (userDoc.exists() && userDoc.data().role === "admin") {
+                    adminBtn.style.display = "inline-block";
+                } else {
+                    adminBtn.style.display = "none";
+                }
+            } catch(e) { console.log(e); }
+
         } else {
-            userDisplay.innerHTML = '<a href="login.html">Вход / Регистрация</a>';
+            userDisplay.innerHTML = '<a href="login.html" style="color: #a5b4fc; text-decoration:none;">Вход</a>';
             logoutBtn.style.display = "none";
             adminBtn.style.display = "none";
         }

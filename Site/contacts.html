@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Контакти | SkyTickets</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --glass: rgba(255, 255, 255, 0.1);
+            --border: rgba(255, 255, 255, 0.2);
+            --text: #ffffff;
+            --text-dim: #cbd5e1;
+            --accent: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        body { 
+            font-family: 'Outfit', sans-serif; 
+            margin: 0; color: var(--text);
+            /* AURORA BACKGROUND */
+            background: linear-gradient(-45deg, #0f0c29, #302b63, #24243e, #1a1a2e);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+            min-height: 100vh;
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* НАВИГАЦИЯ */
+        nav { 
+            background: rgba(15, 12, 41, 0.6);
+            backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+            height: 80px; padding: 0 8%;
+            display: flex; justify-content: space-between; align-items: center; 
+            border-bottom: 1px solid var(--border);
+        }
+        .logo { 
+            font-size: 26px; font-weight: 700; color: white; text-decoration: none; 
+            text-shadow: 0 0 20px rgba(255,255,255,0.3);
+        }
+        .nav-links a { 
+            text-decoration: none; color: var(--text-dim); margin-left: 20px; transition: 0.3s; font-weight: 500;
+        }
+        .nav-links a:hover { color: white; }
+
+        /* КОНТЕЙНЕР */
+        .container { 
+            max-width: 900px; margin: 60px auto; padding: 0 20px; 
+            display: grid; grid-template-columns: 1fr 1fr; gap: 40px;
+        }
+
+        /* ИНФОРМАЦИЯ */
+        .info-box { padding: 20px; }
+        
+        /* ПОПРАВКАТА ЗА ГРАДИЕНТНИЯ ТЕКСТ */
+        .info-box h2 { 
+            font-size: 36px; 
+            margin-top: 0; 
+            
+            /* Градиентен цвят */
+            background: linear-gradient(to right, #ffffff, #a5b4fc);
+            
+            /* Стандартни и Webkit настройки за изрязване */
+            -webkit-background-clip: text;
+            background-clip: text;
+            
+            /* Прозрачен текст, за да се вижда фонът */
+            -webkit-text-fill-color: transparent;
+            color: transparent; 
+        }
+
+        .info-box p { color: var(--text-dim); line-height: 1.6; font-size: 16px; }
+        .info-item { margin-top: 25px; display: flex; align-items: center; gap: 15px; font-size: 18px; color: white; }
+
+        /* ФОРМА (GLASS STYLE) */
+        .contact-form { 
+            background: var(--glass);
+            backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+            padding: 40px; border-radius: 20px; 
+            border: 1px solid var(--border);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+        }
+
+        input, textarea { 
+            width: 100%; padding: 15px; margin-bottom: 20px; 
+            background: rgba(0,0,0,0.3); border: 1px solid var(--border); border-radius: 12px;
+            color: white; font-family: inherit; outline: none; box-sizing: border-box;
+            font-size: 16px; transition: 0.3s;
+        }
+        input:focus, textarea:focus { border-color: #a5b4fc; background: rgba(0,0,0,0.5); }
+
+        button { 
+            background: var(--accent); color: white; border: none; 
+            padding: 15px; border-radius: 12px; font-weight: 700; cursor: pointer; 
+            width: 100%; transition: 0.3s; font-size: 16px;
+            box-shadow: 0 4px 15px rgba(118, 75, 162, 0.4);
+        }
+        button:hover { transform: translateY(-2px); filter: brightness(1.2); }
+
+        @media (max-width: 768px) { .container { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+
+<nav>
+    <a href="index.html" class="logo">SkyTickets</a>
+    <div class="nav-links">
+        <a href="index.html">← Назад</a>
+    </div>
+</nav>
+
+<div class="container">
+    <div class="info-box">
+        <h2>Свържете се с нас</h2>
+        <p>Имате въпроси или проблеми с резервацията? <br>Нашият екип е на разположение, за да помогне.</p>
+        
+        <div style="margin-top: 40px;">
+            <div class="info-item">📍 &nbsp; Варна, България</div>
+            <div class="info-item">📞 &nbsp; +359 888 123 456</div>
+            <div class="info-item">✉️ &nbsp; support@skytickets.bg</div>
+        </div>
+    </div>
+
+    <div class="contact-form">
+        <input type="text" id="msg-name" placeholder="Вашето име">
+        <input type="email" id="msg-email" placeholder="Вашият имейл">
+        <textarea id="msg-text" rows="5" placeholder="Как можем да помогнем?"></textarea>
+        <button onclick="sendMessage()">Изпрати съобщение</button>
+    </div>
+</div>
+
+<script type="module">
+    import { db } from './firebase-config.js';
+    import { collection, addDoc } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-firestore.js";
+
+    window.sendMessage = async () => {
+        const name = document.getElementById('msg-name').value;
+        const email = document.getElementById('msg-email').value;
+        const text = document.getElementById('msg-text').value;
+
+        // Проверка дали полетата са попълнени
+        if (name.trim() === "" || email.trim() === "" || text.trim() === "") {
+            alert("Моля, попълнете всички полета!");
+            return;
+        }
+
+        try {
+            // Записване в колекция 'messages'
+            await addDoc(collection(db, "messages"), {
+                name: name,
+                email: email,
+                message: text,
+                timestamp: new Date().toLocaleString()
+            });
+
+            alert("Благодарим ви! Съобщението е изпратено успешно.");
+            
+            // Изчистване на формата
+            document.getElementById('msg-name').value = "";
+            document.getElementById('msg-email').value = "";
+            document.getElementById('msg-text').value = "";
+
+        } catch (error) {
+            console.error("Грешка:", error);
+            alert("Възникна грешка при изпращането.");
+        }
+    };
+</script>
+
+</body>
+</html>
