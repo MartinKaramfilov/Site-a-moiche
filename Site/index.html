@@ -194,7 +194,7 @@
 <nav>
     <a href="index.html" class="logo">Sky<span>Tickets</span></a>
     <div class="nav-links">
-        <a href="about.html">За нас</a>
+        <a href="aboutus.html">За нас</a>
         <a href="contacts.html">Контакти</a>
         <a href="my-tickets.html">Моите билети</a>
         <a href="admin.html" id="admin-btn" style="display: none;">Админ</a>
@@ -259,7 +259,7 @@
 </footer>
 
 <script type="module">
-   import { auth, db } from './firebase-config.js';
+  import { auth, db } from './firebase-config.js';
     import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-auth.js";
     import { collection, getDocs, doc, updateDoc, getDoc, addDoc } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-firestore.js";
 
@@ -272,7 +272,7 @@
     async function initApp() {
         console.log("Стартиране...");
         
-        // Създаваме календарите
+        // Създаваме календарите (Първоначално празни)
         departureCalendar = flatpickr("#search-date", {
             dateFormat: "Y-m-d",
             minDate: "today",
@@ -297,8 +297,8 @@
                     id: doc.id,
                     from: data.from.toLowerCase().trim(),
                     to: data.to.toLowerCase().trim(),
-                    date: data.date,       // Дата на отиване
-                    returnDate: data.returnDate, // Дата на връщане (ако има)
+                    date: data.date,       
+                    returnDate: data.returnDate, 
                     seats: data.seats,
                     type: data.type || 'oneway',
                     price: data.price
@@ -306,7 +306,7 @@
             });
 
             console.log("Заредени полети:", allFlightsData.length);
-            updateCalendarDates(); // Обновяваме календарите веднага
+            updateCalendarDates(); // Обновяваме веднага
 
         } catch (e) {
             console.error("Грешка при зареждане:", e);
@@ -327,45 +327,51 @@
         });
     }
 
-    // --- 2. УМНИ КАЛЕНДАРИ (ЗА ОТВАРЯНЕ И ЗА ВРЪЩАНЕ) ---
+    // --- 2. УМНИ КАЛЕНДАРИ (СТРИКТНА ЛОГИКА) ---
     function updateCalendarDates() {
         const fromInput = document.getElementById('search-from').value.toLowerCase().trim();
         const toInput = document.getElementById('search-to').value.toLowerCase().trim();
         const selectedType = document.querySelector('input[name="trip"]:checked').value;
 
-        // 1. Намираме всички подходящи полети
+        // ВАЖНО: Ако ПОНЕ ЕДНО от полетата е празно -> СКРИВАМЕ ВСИЧКИ ДАТИ
+        // Така потребителят трябва да въведе маршрут, преди да види дати.
+        if (fromInput === "" || toInput === "") {
+            departureCalendar.set('enable', []); 
+            returnCalendar.set('enable', []);
+            return; 
+        }
+
+        // Филтрираме само ако има маршрут
         const matchingFlights = allFlightsData.filter(flight => {
-            // Има ли места?
             if (flight.seats <= 0) return false;
-            // Типът съвпада ли? (oneway или round)
             if (flight.type !== selectedType) return false;
-            // Градовете съвпадат ли?
-            const matchFrom = fromInput === "" || flight.from.includes(fromInput);
-            const matchTo = toInput === "" || flight.to.includes(toInput);
+            
+            // Търсим съвпадение (частично)
+            const matchFrom = flight.from.includes(fromInput);
+            const matchTo = flight.to.includes(toInput);
             
             return matchFrom && matchTo;
         });
 
-        // 2. Вадим датите за ОТВАРЯНЕ
+        // Вадим валидните дати
         const validDepartureDates = matchingFlights.map(f => f.date);
-
-        // 3. Вадим датите за ВРЪЩАНЕ (само тези, които не са null)
+        
         const validReturnDates = matchingFlights
-            .filter(f => f.returnDate) // филтрираме празните
+            .filter(f => f.returnDate)
             .map(f => f.returnDate);
 
-        // 4. Обновяваме ПЪРВИЯ календар
+        // Обновяваме календара за ОТИВАНЕ
         if (validDepartureDates.length > 0) {
             departureCalendar.set('enable', validDepartureDates);
         } else {
             departureCalendar.set('enable', []);
         }
 
-        // 5. Обновяваме ВТОРИЯ календар (Това липсваше!)
+        // Обновяваме календара за ВРЪЩАНЕ
         if (validReturnDates.length > 0) {
             returnCalendar.set('enable', validReturnDates);
         } else {
-            returnCalendar.set('enable', []); // Ако няма дати, заключваме всичко
+            returnCalendar.set('enable', []);
         }
     }
 
@@ -385,14 +391,12 @@
         }
     };
 
-    // --- 4. ТЪРСЕНЕ ---
+    // --- 4. ТЪРСЕНЕ И ПОКАЗВАНЕ ---
     window.displayFlights = async () => { 
         const fromCity = document.getElementById('search-from').value.toLowerCase().trim();
         const toCity = document.getElementById('search-to').value.toLowerCase().trim();
         const dateInput = document.getElementById('search-date').value;
         const selectedType = document.querySelector('input[name="trip"]:checked').value;
-        
-        // Взимаме и избраната дата на връщане (ако има)
         const returnDateInput = document.getElementById('search-return-date').value;
 
         const flightsList = document.getElementById('flights-list');
@@ -404,11 +408,8 @@
         allFlightsData.forEach((f) => {
             const matchFrom = fromCity === "" || f.from.includes(fromCity);
             const matchTo = toCity === "" || f.to.includes(toCity);
-            
-            // Проверка за дата на отиване
             const matchDate = dateInput === "" || f.date === dateInput;
             
-            // Проверка за дата на връщане (само ако е избран двупосочен и е въведена дата)
             let matchReturnDate = true;
             if (selectedType === 'round' && returnDateInput !== "") {
                 matchReturnDate = f.returnDate === returnDateInput;
