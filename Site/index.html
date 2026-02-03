@@ -36,7 +36,7 @@
             100% { background-position: 0% 50%; }
         }
 
-        /* 2. СТИЛ ЗА КАЛЕНДАРА (Override Flatpickr) */
+        /* КАЛЕНДАР ДИЗАЙН */
         .flatpickr-calendar {
             background: rgba(15, 12, 41, 0.95) !important;
             backdrop-filter: blur(15px) !important;
@@ -44,27 +44,14 @@
             box-shadow: 0 10px 40px rgba(0,0,0,0.5) !important;
             font-family: 'Outfit', sans-serif !important;
         }
-        
-        /* Неактивните дни (сиви) */
-        .flatpickr-day.flatpickr-disabled {
-            color: #475569 !important;
-            opacity: 0.5;
-        }
-
-        /* АКТИВНИТЕ ДНИ (Има полети) - Бели и удебелени */
+        .flatpickr-day.flatpickr-disabled { color: #475569 !important; opacity: 0.5; }
         .flatpickr-day.enabled {
-            color: white !important;
-            font-weight: 700 !important;
-            border-bottom: 2px solid #667eea;
-            background: rgba(255,255,255,0.05);
+            color: white !important; font-weight: 700 !important;
+            border-bottom: 2px solid #667eea; background: rgba(255,255,255,0.05);
         }
-        
-        /* Избраният ден */
         .flatpickr-day.selected {
-            background: var(--accent) !important;
-            border-color: transparent !important;
-            color: white !important;
-            box-shadow: var(--glow);
+            background: var(--accent) !important; border-color: transparent !important;
+            color: white !important; box-shadow: var(--glow);
         }
 
         /* НАВИГАЦИЯ */
@@ -82,8 +69,7 @@
         .hero { text-align: center; padding: 80px 20px 50px; }
         .hero h1 { 
             font-size: 52px; margin: 0; font-weight: 700; letter-spacing: -1px;
-            color: white; 
-            text-shadow: 0 0 20px rgba(165, 180, 252, 0.6);
+            color: white; text-shadow: 0 0 20px rgba(165, 180, 252, 0.6);
         }
 
         /* ТЪРСАЧКА */
@@ -93,8 +79,7 @@
             background: var(--glass-panel);
             backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
             border: 1px solid var(--border);
-            border-radius: 24px;
-            padding: 30px;
+            border-radius: 24px; padding: 30px;
             box-shadow: 0 20px 50px rgba(0,0,0,0.5);
         }
 
@@ -113,17 +98,13 @@
         .search-grid {
             display: grid;
             grid-template-columns: 2fr 1fr 1fr 0.7fr auto;
-            gap: 15px;
-            align-items: center;
+            gap: 15px; align-items: center;
         }
 
         .input-group-merged {
-            display: flex;
-            background: var(--glass-input);
-            border: 1px solid var(--border);
-            border-radius: 16px;
-            overflow: hidden;
-            transition: 0.3s;
+            display: flex; background: var(--glass-input);
+            border: 1px solid var(--border); border-radius: 16px;
+            overflow: hidden; transition: 0.3s;
         }
         .input-group-merged:focus-within { border-color: #667eea; box-shadow: 0 0 15px rgba(102, 126, 234, 0.2); }
 
@@ -136,24 +117,17 @@
         .separator { width: 1px; background: var(--border); margin: 10px 0; }
 
         .single-input {
-            background: var(--glass-input);
-            border: 1px solid var(--border);
-            border-radius: 16px;
-            padding: 10px 20px;
-            height: 66px; 
+            background: var(--glass-input); border: 1px solid var(--border);
+            border-radius: 16px; padding: 10px 20px; height: 66px; 
             display: flex; flex-direction: column; justify-content: center;
             box-sizing: border-box; transition: 0.3s;
         }
         .single-input:focus-within { border-color: #667eea; box-shadow: 0 0 15px rgba(102, 126, 234, 0.2); }
         .single-input label { font-size: 12px; color: var(--text-muted); display: block; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 1px;}
-        
-        /* ВАЖНО: Input type="text" за календара да изглежда добре */
         .single-input input { border: none; background: transparent; outline: none; font-size: 16px; font-weight: 600; color: white; width: 100%; font-family: inherit;}
 
         .single-input.disabled {
-            opacity: 0.5;
-            pointer-events: none;
-            background: rgba(0,0,0,0.2);
+            opacity: 0.5; pointer-events: none; background: rgba(0,0,0,0.2);
         }
 
         .search-btn {
@@ -259,7 +233,7 @@
 </footer>
 
 <script type="module">
-  import { auth, db } from './firebase-config.js';
+    import { auth, db } from './firebase-config.js';
     import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-auth.js";
     import { collection, getDocs, doc, updateDoc, getDoc, addDoc } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-firestore.js";
 
@@ -272,7 +246,7 @@
     async function initApp() {
         console.log("Стартиране...");
         
-        // Създаваме календарите (Първоначално празни)
+        // Създаваме календарите
         departureCalendar = flatpickr("#search-date", {
             dateFormat: "Y-m-d",
             minDate: "today",
@@ -286,7 +260,7 @@
             disableMobile: "true"
         });
 
-        // Дърпаме данните от Firebase
+        // Дърпаме всички полети веднъж
         try {
             const querySnapshot = await getDocs(collection(db, "flights"));
             allFlightsData = []; 
@@ -301,12 +275,15 @@
                     returnDate: data.returnDate, 
                     seats: data.seats,
                     type: data.type || 'oneway',
-                    price: data.price
+                    price: data.price,
+                    // Взимаме часовете
+                    depTime: data.depTime || "00:00",
+                    arrTime: data.arrTime || "00:00"
                 });
             });
 
             console.log("Заредени полети:", allFlightsData.length);
-            updateCalendarDates(); // Обновяваме веднага
+            updateCalendarDates(); // Обновяваме (ще скрие всичко, ако е празно)
 
         } catch (e) {
             console.error("Грешка при зареждане:", e);
@@ -333,49 +310,37 @@
         const toInput = document.getElementById('search-to').value.toLowerCase().trim();
         const selectedType = document.querySelector('input[name="trip"]:checked').value;
 
-        // ВАЖНО: Ако ПОНЕ ЕДНО от полетата е празно -> СКРИВАМЕ ВСИЧКИ ДАТИ
-        // Така потребителят трябва да въведе маршрут, преди да види дати.
+        // АКО ПОНЕ ЕДНО ПОЛЕ Е ПРАЗНО -> СКРИВАМЕ ВСИЧКО
         if (fromInput === "" || toInput === "") {
             departureCalendar.set('enable', []); 
             returnCalendar.set('enable', []);
             return; 
         }
 
-        // Филтрираме само ако има маршрут
+        // Филтрираме
         const matchingFlights = allFlightsData.filter(flight => {
             if (flight.seats <= 0) return false;
             if (flight.type !== selectedType) return false;
             
-            // Търсим съвпадение (частично)
             const matchFrom = flight.from.includes(fromInput);
             const matchTo = flight.to.includes(toInput);
             
             return matchFrom && matchTo;
         });
 
-        // Вадим валидните дати
+        // Вадим датите
         const validDepartureDates = matchingFlights.map(f => f.date);
-        
-        const validReturnDates = matchingFlights
-            .filter(f => f.returnDate)
-            .map(f => f.returnDate);
+        const validReturnDates = matchingFlights.filter(f => f.returnDate).map(f => f.returnDate);
 
-        // Обновяваме календара за ОТИВАНЕ
-        if (validDepartureDates.length > 0) {
-            departureCalendar.set('enable', validDepartureDates);
-        } else {
-            departureCalendar.set('enable', []);
-        }
+        // Обновяваме календарите
+        if (validDepartureDates.length > 0) departureCalendar.set('enable', validDepartureDates);
+        else departureCalendar.set('enable', []);
 
-        // Обновяваме календара за ВРЪЩАНЕ
-        if (validReturnDates.length > 0) {
-            returnCalendar.set('enable', validReturnDates);
-        } else {
-            returnCalendar.set('enable', []);
-        }
+        if (validReturnDates.length > 0) returnCalendar.set('enable', validReturnDates);
+        else returnCalendar.set('enable', []);
     }
 
-    // --- 3. UI ЛОГИКА ---
+    // --- 3. СКРИВАНЕ НА "ВРЪЩАНЕ" ---
     window.toggleReturnDate = () => {
         const isOneWay = document.querySelector('input[name="trip"][value="oneway"]').checked;
         const returnContainer = document.getElementById('return-date-container');
@@ -398,8 +363,8 @@
         const dateInput = document.getElementById('search-date').value;
         const selectedType = document.querySelector('input[name="trip"]:checked').value;
         const returnDateInput = document.getElementById('search-return-date').value;
-
         const flightsList = document.getElementById('flights-list');
+        
         flightsList.innerHTML = "<p style='text-align:center; color: #a5b4fc;'>Търсене...</p>";
         
         let hasFlights = false;
@@ -411,9 +376,7 @@
             const matchDate = dateInput === "" || f.date === dateInput;
             
             let matchReturnDate = true;
-            if (selectedType === 'round' && returnDateInput !== "") {
-                matchReturnDate = f.returnDate === returnDateInput;
-            }
+            if (selectedType === 'round' && returnDateInput !== "") matchReturnDate = f.returnDate === returnDateInput;
 
             const matchType = f.type === selectedType;
 
@@ -425,16 +388,24 @@
                     returnHtml = ` | <span style="color:#ffcc00">🔙 ${f.returnDate}</span>`;
                 }
 
+                // ВГРАЖДАМЕ И ЧАСОВЕТЕ
                 flightsList.innerHTML += `
                     <div class="flight-card">
                         <div class="flight-info">
-                            <h3 style="margin:0; font-size:22px;">${f.from.toUpperCase()} ➔ <span style="color:#a5b4fc">${f.to.toUpperCase()}</span></h3>
-                            <div style="font-size:14px; color:#cbd5e1; margin-top:5px;">
+                            <h3 style="margin:0; font-size:22px;">
+                                ${f.from.toUpperCase()} <span style="color:#667eea">✈</span> ${f.to.toUpperCase()}
+                            </h3>
+                            
+                            <div style="font-size: 18px; font-weight: 700; margin: 8px 0; color: white;">
+                                ${f.depTime} <span style="font-weight:300; font-size:14px; opacity:0.7">➜</span> ${f.arrTime}
+                            </div>
+
+                            <div style="font-size:14px; color:#cbd5e1;">
                                 📅 ${f.date} ${returnHtml} &nbsp;|&nbsp; 💺 ${f.seats} места
                             </div>
                         </div>
                         <div>
-                            <div class="price-tag">${f.price} лв.</div>
+                            <div class="price-tag">${f.price} € </div>
                             <button onclick="buyTicket('${f.id}')" class="buy-btn">Купи</button>
                         </div>
                     </div>`;
@@ -483,7 +454,7 @@
 
     document.getElementById('btn-search').onclick = displayFlights;
 
-    // --- 6. AUTH ---
+    // --- 6. AUTH STATE ---
     onAuthStateChanged(auth, async (user) => {
         const userDisplay = document.getElementById('user-display');
         const logoutBtn = document.getElementById('btn-logout');

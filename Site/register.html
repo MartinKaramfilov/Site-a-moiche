@@ -3,70 +3,263 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Регистрация - Самолетни билети</title>
+    <title>Регистрация | SkyTickets</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;700&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f7f6; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-        .auth-card { background: white; padding: 2rem; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); width: 100%; max-width: 400px; }
-        h2 { text-align: center; color: #333; }
-        input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box; }
-        button { width: 100%; padding: 12px; background-color: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; margin-top: 10px; }
-        button:hover { background-color: #0056b3; }
-        .link { text-align: center; margin-top: 15px; font-size: 14px; }
-        .link a { color: #007bff; text-decoration: none; }
+        :root {
+            --glass: rgba(255, 255, 255, 0.1);
+            --border: rgba(255, 255, 255, 0.2);
+            --text: #ffffff;
+            --text-dim: #cbd5e1;
+            --accent: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --weak: #ff4757;
+            --medium: #ffa502;
+            --strong: #2ed573;
+        }
+
+        body { 
+            font-family: 'Outfit', sans-serif; 
+            margin: 0; color: var(--text);
+            background: linear-gradient(-45deg, #0f0c29, #302b63, #24243e, #1a1a2e);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+            min-height: 100vh;
+            display: flex; justify-content: center; align-items: center;
+            padding: 20px; /* Малко отстъп за мобилни */
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .login-card {
+            background: var(--glass);
+            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--border);
+            padding: 40px; border-radius: 24px;
+            width: 100%; max-width: 500px; /* По-широка карта за повече полета */
+            text-align: center;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+            max-height: 90vh; /* За да не излиза от екрана */
+            overflow-y: auto; /* Скрол, ако екрана е малък */
+        }
+        
+        /* Скриваме скролбара за красота */
+        .login-card::-webkit-scrollbar { width: 0; }
+
+        .logo { font-size: 32px; font-weight: 700; color: white; display: block; margin-bottom: 10px; text-shadow: 0 0 20px rgba(255,255,255,0.3); }
+        .subtitle { color: var(--text-dim); font-size: 16px; margin-bottom: 25px; }
+
+        /* GRID ЗА ПОЛЕТАТА (Две на ред) */
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        input, select { 
+            width: 100%; padding: 12px; 
+            background: rgba(0,0,0,0.3); border: 1px solid var(--border); border-radius: 12px;
+            color: white; font-family: inherit; outline: none; box-sizing: border-box; font-size: 15px;
+            transition: 0.3s;
+        }
+        input:focus, select:focus { border-color: #a5b4fc; background: rgba(0,0,0,0.5); }
+        
+        /* Оправяне на опциите в Select (да са тъмни) */
+        option { background: #1a1a2e; color: white; }
+
+        /* ПАРОЛА И ОКО */
+        .password-wrapper { position: relative; width: 100%; margin-bottom: 15px; }
+        .eye-icon {
+            position: absolute; right: 15px; top: 12px; 
+            cursor: pointer; font-size: 18px; color: var(--text-dim);
+            user-select: none; transition: 0.3s;
+        }
+        .eye-icon:hover { color: white; }
+
+        /* ИНДИКАТОР */
+        .strength-container {
+            text-align: left; margin-bottom: 20px;
+            background: rgba(0,0,0,0.2); padding: 10px; border-radius: 10px;
+        }
+        .strength-bar {
+            height: 4px; width: 0%; background: var(--weak); 
+            border-radius: 2px; transition: 0.3s; margin-top: 5px;
+        }
+        .strength-text { font-size: 12px; margin-top: 5px; color: var(--text-dim); }
+
+        button { 
+            background: var(--accent); color: white; border: none; 
+            padding: 15px; border-radius: 12px; font-weight: 700; cursor: pointer; 
+            width: 100%; font-size: 16px; margin-top: 5px; transition: 0.3s;
+            box-shadow: 0 4px 15px rgba(118, 75, 162, 0.4);
+        }
+        button:hover { transform: translateY(-2px); filter: brightness(1.2); }
+        button:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+        .links { margin-top: 20px; font-size: 14px; color: var(--text-dim); }
+        .links a { color: #a5b4fc; font-weight: 700; text-decoration: none; }
+        
+        #error-msg { color: #ff4757; font-size: 14px; margin-bottom: 15px; display: none; }
     </style>
 </head>
 <body>
 
-    <div class="auth-card">
-        <h2>Създай профил</h2>
-        <input type="email" id="reg-email" placeholder="Имейл адрес">
-        <input type="password" id="reg-pass" placeholder="Парола (минимум 6 символа)">
-        <button id="btn-register">Регистрирай ме</button>
-        
-        <div class="link">
-            Вече имаш профил? <a href="login.html">Влез тук</a>
-        </div>
+<div class="login-card">
+    <div class="logo">SkyTickets</div>
+    <div class="subtitle">Създайте профил</div>
+
+    <p id="error-msg"></p>
+
+    <div class="form-row">
+        <input type="text" id="firstName" placeholder="Име">
+        <input type="text" id="lastName" placeholder="Фамилия">
     </div>
 
-    <script type="module">
-        // 1. Импортираме твоите настройки
-        import { auth, db } from './firebase-config.js';
-        
-        // 2. Импортираме нужните функции от библиотеката на Firebase
-        import { createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-auth.js";
-        import { doc, setDoc } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-firestore.js";
+    <div class="form-row">
+        <div style="position:relative;">
+            <label style="font-size:10px; color:#cbd5e1; position:absolute; top:-18px; left:5px;">Дата на раждане</label>
+            <input type="date" id="birthDate" style="color-scheme: dark;">
+        </div>
+        <select id="gender">
+            <option value="" disabled selected>Пол</option>
+            <option value="male">Мъж</option>
+            <option value="female">Жена</option>
+        </select>
+    </div>
 
-        // 3. Хващаме бутона и добавяме събитие
-        document.getElementById('btn-register').addEventListener('click', async () => {
-            const email = document.getElementById('reg-email').value;
-            const password = document.getElementById('reg-pass').value;
+    <div class="form-row">
+        <input type="text" id="postalCode" placeholder="Пощенски код">
+        <input type="tel" id="phone" placeholder="Телефон">
+    </div>
 
-            if (email === "" || password === "") {
-                alert("Моля, попълнете всички полета!");
-                return;
-            }
+    <input type="email" id="email" placeholder="Имейл адрес" style="margin-bottom: 15px;">
+    
+    <div class="password-wrapper">
+        <input type="password" id="password" placeholder="Парола">
+        <span class="eye-icon" onclick="togglePasswordVisibility()">👁️</span>
+    </div>
+    
+    <div class="strength-container">
+        <div class="strength-bar" id="strength-bar"></div>
+        <div class="strength-text" id="strength-text">Въведете парола...</div>
+    </div>
 
-            try {
-                // А) Създаваме потребителя в Authentication частта
-                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-                const user = userCredential.user;
+    <button id="btn-register" onclick="handleRegister()" disabled>Регистрация</button>
 
-                // Б) Записваме ролята му в базата данни (Firestore)
-                // Създаваме документ в колекция "users" с ID същото като на потребителя
-                await setDoc(doc(db, "users", user.uid), {
-                    email: email,
-                    role: "user", // Всички нови са обикновени потребители
-                    createdAt: new Date()
-                });
+    <div class="links">
+        Вече имате акаунт? <a href="login.html">Вход</a>
+    </div>
+</div>
 
-                alert("Успешна регистрация!");
-                window.location.href = "index.html"; // Препращаме към началната страница
+<script type="module">
+    import { auth } from './firebase-config.js';
+    import { createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-auth.js";
+    import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-firestore.js";
 
-            } catch (error) {
-                console.error("Грешка:", error);
-                alert("Грешка при регистрация: " + error.message);
-            }
-        });
-    </script>
+    const db = getFirestore();
+    const passwordInput = document.getElementById('password');
+    const strengthBar = document.getElementById('strength-bar');
+    const strengthText = document.getElementById('strength-text');
+    const registerBtn = document.getElementById('btn-register');
+    const errorMsg = document.getElementById('error-msg');
+
+    // 1. ОКОТО ЗА ПАРОЛАТА
+    window.togglePasswordVisibility = () => {
+        const icon = document.querySelector('.eye-icon');
+        if (passwordInput.type === "password") {
+            passwordInput.type = "text";
+            icon.innerText = "🙈";
+        } else {
+            passwordInput.type = "password";
+            icon.innerText = "👁️";
+        }
+    };
+
+    // 2. ВАЛИДАЦИЯ НА ПАРОЛАТА
+    passwordInput.addEventListener('input', () => {
+        const val = passwordInput.value;
+        let strength = 0;
+        let tips = [];
+
+        if (val.length >= 6) strength++; else tips.push("6+ симв.");
+        if (/[A-Z]/.test(val)) strength++; else tips.push("главна");
+        if (/[a-z]/.test(val)) strength++; else tips.push("малка");
+        if (/[0-9!@#$%^&*]/.test(val)) strength++; else tips.push("символ");
+
+        if (val.length === 0) {
+            strengthBar.style.width = '0%';
+            strengthText.innerText = "Въведете парола...";
+            registerBtn.disabled = true;
+            return;
+        }
+
+        if (strength < 2) {
+            strengthBar.style.width = '30%'; strengthBar.style.background = 'var(--weak)';
+            strengthText.style.color = 'var(--weak)'; strengthText.innerText = "Слаба: " + tips.join(", ");
+            registerBtn.disabled = true;
+        } else if (strength < 4) {
+            strengthBar.style.width = '60%'; strengthBar.style.background = 'var(--medium)';
+            strengthText.style.color = 'var(--medium)'; strengthText.innerText = "Средна: " + tips.join(", ");
+            registerBtn.disabled = true;
+        } else {
+            strengthBar.style.width = '100%'; strengthBar.style.background = 'var(--strong)';
+            strengthText.style.color = 'var(--strong)'; strengthText.innerText = "✅ Отлична парола!";
+            registerBtn.disabled = false;
+        }
+    });
+
+    // 3. РЕГИСТРАЦИЯ (СЪБИРАНЕ НА ВСИЧКИ ДАННИ)
+    window.handleRegister = async () => {
+        // Взимаме данните от новите полета
+        const firstName = document.getElementById('firstName').value.trim();
+        const lastName = document.getElementById('lastName').value.trim();
+        const birthDate = document.getElementById('birthDate').value;
+        const gender = document.getElementById('gender').value;
+        const postalCode = document.getElementById('postalCode').value.trim();
+        const phone = document.getElementById('phone').value.trim();
+        const email = document.getElementById('email').value.trim();
+        const password = document.getElementById('password').value;
+
+        // Проверка дали всичко е попълнено
+        if(!firstName || !lastName || !birthDate || !gender || !postalCode || !phone || !email || !password) {
+            errorMsg.innerText = "Моля, попълнете всички полета!";
+            errorMsg.style.display = 'block';
+            return;
+        }
+
+        try {
+            // Създаваме потребител в Auth (Само имейл и парола)
+            const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+            const user = userCredential.user;
+
+            // ЗАПИСВАМЕ ОСТАНАЛИТЕ ДАННИ В FIRESTORE
+            await setDoc(doc(db, "users", user.uid), {
+                email: user.email,
+                firstName: firstName,
+                lastName: lastName,
+                birthDate: birthDate,
+                gender: gender,
+                postalCode: postalCode,
+                phone: phone,
+                role: "user", // По подразбиране е потребител
+                createdAt: new Date()
+            });
+
+            alert("Успешна регистрация!");
+            window.location.href = "index.html";
+
+        } catch (error) {
+            console.error(error);
+            if (error.code === 'auth/email-already-in-use') errorMsg.innerText = "Този имейл вече е регистриран.";
+            else errorMsg.innerText = "Грешка: " + error.message;
+            errorMsg.style.display = 'block';
+        }
+    };
+</script>
+
 </body>
 </html>

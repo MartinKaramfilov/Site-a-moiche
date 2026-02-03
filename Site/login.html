@@ -3,54 +3,152 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Вход - Самолетни билети</title>
+    <title>Вход | SkyTickets</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;700&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f7f6; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-        .auth-card { background: white; padding: 2rem; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); width: 100%; max-width: 400px; }
-        h2 { text-align: center; color: #333; }
-        input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box; }
-        button { width: 100%; padding: 12px; background-color: #28a745; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; margin-top: 10px; }
-        button:hover { background-color: #218838; }
-        .link { text-align: center; margin-top: 15px; font-size: 14px; }
-        .link a { color: #007bff; text-decoration: none; }
+        :root {
+            --glass: rgba(255, 255, 255, 0.1);
+            --border: rgba(255, 255, 255, 0.2);
+            --text: #ffffff;
+            --text-dim: #cbd5e1;
+            --accent: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        body { 
+            font-family: 'Outfit', sans-serif; 
+            margin: 0; color: var(--text);
+            background: linear-gradient(-45deg, #0f0c29, #302b63, #24243e, #1a1a2e);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+            height: 100vh;
+            display: flex; justify-content: center; align-items: center;
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .login-card {
+            background: var(--glass);
+            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--border);
+            padding: 40px; border-radius: 24px;
+            width: 100%; max-width: 400px;
+            text-align: center;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+        }
+
+        .logo { font-size: 32px; font-weight: 700; color: white; display: block; margin-bottom: 10px; text-shadow: 0 0 20px rgba(255,255,255,0.3); }
+        .subtitle { color: var(--text-dim); font-size: 16px; margin-bottom: 30px; }
+
+        /* КОНТЕЙНЕР ЗА ПАРОЛАТА */
+        .password-wrapper {
+            position: relative;
+            width: 100%;
+            margin-bottom: 20px;
+        }
+
+        input { 
+            width: 100%; padding: 15px; 
+            background: rgba(0,0,0,0.3); border: 1px solid var(--border); border-radius: 12px;
+            color: white; font-family: inherit; outline: none; box-sizing: border-box; font-size: 16px;
+            transition: 0.3s;
+        }
+        #email { margin-bottom: 15px; }
+
+        input:focus { border-color: #a5b4fc; background: rgba(0,0,0,0.5); }
+
+        /* ОКОТО */
+        .eye-icon {
+            position: absolute;
+            right: 15px;
+            top: 15px; 
+            cursor: pointer;
+            font-size: 20px;
+            color: var(--text-dim);
+            user-select: none;
+            transition: 0.3s;
+        }
+        .eye-icon:hover { color: white; }
+
+        button { 
+            background: var(--accent); color: white; border: none; 
+            padding: 15px; border-radius: 12px; font-weight: 700; cursor: pointer; 
+            width: 100%; font-size: 16px; margin-top: 10px; transition: 0.3s;
+            box-shadow: 0 4px 15px rgba(118, 75, 162, 0.4);
+        }
+        button:hover { transform: translateY(-2px); filter: brightness(1.2); }
+
+        .links { margin-top: 20px; font-size: 14px; color: var(--text-dim); }
+        .links a { color: #a5b4fc; font-weight: 700; text-decoration: none; }
+        
+        #error-msg { color: #ff4757; font-size: 14px; margin-bottom: 15px; display: none; }
     </style>
 </head>
 <body>
 
-    <div class="auth-card">
-        <h2>Вход в системата</h2>
-        <input type="email" id="login-email" placeholder="Имейл адрес">
-        <input type="password" id="login-pass" placeholder="Парола">
-        <button id="btn-login">Влез</button>
-        
-        <div class="link">
-            Нямаш профил? <a href="register.html">Регистрирай се тук</a>
-        </div>
+<div class="login-card">
+    <div class="logo">SkyTickets</div>
+    <div class="subtitle">Влезте, за да резервирате</div>
+
+    <p id="error-msg"></p>
+
+    <input type="email" id="email" placeholder="Имейл адрес">
+    
+    <div class="password-wrapper">
+        <input type="password" id="password" placeholder="Парола">
+        <span class="eye-icon" onclick="togglePasswordVisibility()">👁️</span>
     </div>
+    
+    <button onclick="handleLogin()">Вход</button>
 
-    <script type="module">
-        // 1. Вземаме настройките от твоя файл
-        import { auth } from './firebase-config.js';
-        
-        // 2. Вземаме функцията за вход от Firebase
-        import { signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-auth.js";
+    <div class="links">
+        Нямате акаунт? <a href="register.html">Регистрирайте се</a>
+        <br><br>
+        <a href="index.html" style="color: rgba(255,255,255,0.5); font-size: 12px;">← Обратно към сайта</a>
+    </div>
+</div>
 
-        document.getElementById('btn-login').addEventListener('click', async () => {
-            const email = document.getElementById('login-email').value;
-            const password = document.getElementById('login-pass').value;
+<script type="module">
+    import { auth } from './firebase-config.js';
+    import { signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-auth.js";
 
-            try {
-                // Опит за вход
-                await signInWithEmailAndPassword(auth, email, password);
-                
-                alert("Успешен вход!");
-                // Тук ще пренасочим към началната страница
-                window.location.href = "index.html"; 
-            } catch (error) {
-                alert("Грешка при вход: Проверете имейла и паролата!");
-                console.error(error.message);
-            }
-        });
-    </script>
+    const errorMsg = document.getElementById('error-msg');
+    const passwordInput = document.getElementById('password');
+
+    // ФУНКЦИЯ ЗА ОКОТО
+    window.togglePasswordVisibility = () => {
+        const icon = document.querySelector('.eye-icon');
+        if (passwordInput.type === "password") {
+            passwordInput.type = "text";
+            icon.innerText = "🙈";
+        } else {
+            passwordInput.type = "password";
+            icon.innerText = "👁️";
+        }
+    };
+
+    window.handleLogin = async () => {
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+
+        if(!email || !password) {
+            errorMsg.innerText = "Попълнете всички полета.";
+            errorMsg.style.display = 'block'; return;
+        }
+
+        try {
+            await signInWithEmailAndPassword(auth, email, password);
+            window.location.href = "index.html"; 
+        } catch (error) {
+            console.error(error);
+            errorMsg.innerText = "Грешен имейл или парола.";
+            errorMsg.style.display = 'block';
+        }
+    };
+</script>
+
 </body>
 </html>

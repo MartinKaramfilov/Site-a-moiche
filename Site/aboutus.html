@@ -4,50 +4,168 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>За нас | SkyTickets</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;700&display=swap" rel="stylesheet">
     <style>
-        :root { --bg: #f8fafc; --white: #ffffff; --primary: #1e293b; --accent: #2563eb; --text-dim: #64748b; }
-        body { font-family: 'Inter', sans-serif; background-color: var(--bg); margin: 0; color: #0f172a; line-height: 1.6; }
-        
-        nav { background: var(--white); height: 70px; padding: 0 8%; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e2e8f0; }
-        .logo { font-size: 20px; font-weight: 800; color: var(--primary); text-decoration: none; }
-        .logo span { color: var(--accent); }
-        .nav-links a { text-decoration: none; color: var(--text-dim); font-weight: 600; margin-left: 20px; font-size: 14px; }
+        :root {
+            --glass: rgba(255, 255, 255, 0.1);
+            --glass-hover: rgba(255, 255, 255, 0.15);
+            --border: rgba(255, 255, 255, 0.2);
+            --text: #ffffff;
+            --text-dim: #cbd5e1;
+            --accent: #667eea;
+        }
 
-        .container { max-width: 800px; margin: 60px auto; padding: 0 20px; text-align: center; }
-        h1 { font-size: 36px; font-weight: 800; letter-spacing: -1px; }
-        .content { background: var(--white); padding: 40px; border-radius: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); text-align: left; margin-top: 40px; }
-        .feature { margin-bottom: 30px; }
-        .feature h3 { color: var(--accent); margin-bottom: 10px; }
+        body { 
+            font-family: 'Outfit', sans-serif; 
+            margin: 0; color: var(--text);
+            background: linear-gradient(-45deg, #0f0c29, #302b63, #24243e, #1a1a2e);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+            min-height: 100vh;
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* НАВИГАЦИЯ */
+        nav { 
+            background: rgba(15, 12, 41, 0.6);
+            backdrop-filter: blur(12px);
+            height: 80px; padding: 0 8%;
+            display: flex; justify-content: space-between; align-items: center; 
+            border-bottom: 1px solid var(--border);
+            position: sticky; top: 0; z-index: 100;
+        }
+        .logo { font-size: 26px; font-weight: 700; color: white; text-decoration: none; text-shadow: 0 0 15px rgba(255,255,255,0.2); }
+        .nav-links a { text-decoration: none; color: var(--text-dim); margin-left: 25px; transition: 0.3s; font-weight: 500; }
+        .nav-links a:hover { color: white; }
+
+        /* ОСНОВЕН КОНТЕЙНЕР */
+        .container { max-width: 1000px; margin: 60px auto; padding: 0 20px; }
+
+        h1 { font-size: 42px; text-align: center; margin-bottom: 40px; text-shadow: 0 0 20px rgba(165, 180, 252, 0.5); }
+        h2 { font-size: 28px; margin-bottom: 20px; color: #a5b4fc; }
+        p { line-height: 1.6; color: var(--text-dim); font-size: 18px; margin-bottom: 20px; }
+
+        /* СТЪКЛЕНИ КАРТИ */
+        .glass-card {
+            background: var(--glass);
+            backdrop-filter: blur(16px);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            padding: 40px;
+            margin-bottom: 40px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            transition: 0.3s;
+        }
+        .glass-card:hover { transform: translateY(-5px); background: var(--glass-hover); }
+
+        /* GRID ЗА "ЗАЩО НИЕ" */
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .feature-item {
+            background: rgba(0,0,0,0.2);
+            padding: 25px; border-radius: 16px;
+            text-align: center; border: 1px solid rgba(255,255,255,0.05);
+        }
+        .feature-icon { font-size: 40px; margin-bottom: 15px; display: block; }
+        .feature-title { font-weight: 700; font-size: 20px; margin-bottom: 10px; color: white; }
+        .feature-desc { font-size: 14px; color: var(--text-dim); }
+
+        footer {
+            text-align: center; color: var(--text-dim); padding: 40px 0; font-size: 14px;
+            border-top: 1px solid var(--border); margin-top: 60px;
+        }
     </style>
 </head>
 <body>
-    <nav>
-        <a href="index.html" class="logo">Sky<span>Tickets</span></a>
-        <div class="nav-links">
-            <a href="index.html">Начало</a>
-            <a href="contacts.html">Контакти</a>
-        </div>
-    </nav>
 
-    <div class="container">
-        <h1>Нашата мисия</h1>
-        <p>Ние правим пътуването достъпно, лесно и приятно за всеки.</p>
+<nav>
+    <a href="index.html" class="logo">SkyTickets</a>
+    <div class="nav-links">
+        <a href="index.html">Търсене</a>
+        <a href="my-tickets.html">Моите билети</a>
+        <a href="contacts.html">Контакти</a>
+        <span id="user-display" style="font-size: 14px; font-weight: 500; color: #a5b4fc; margin-left:15px;"></span>
+    </div>
+</nav>
+
+<div class="container">
+    <h1>За SkyTickets</h1>
+
+    <div class="glass-card">
+        <h2>Нашата мисия</h2>
+        <p>
+            SkyTickets не е просто платформа за резервации. Ние сме бъдещето на удобното пътуване. 
+            Създадохме тази система с една цел – да премахнем стреса от планирането на полети и да го заменим с 
+            елегантност, бързина и сигурност.
+        </p>
+        <p>
+            Вярваме, че всеки полет е началото на ново приключение. Независимо дали пътувате по работа или за удоволствие, 
+            нашият интерфейс ви позволява да намерите най-добрите оферти за секунди.
+        </p>
+    </div>
+
+    <div class="glass-card">
+        <h2 style="text-align: center;">Защо да изберете нас?</h2>
         
-        <div class="content">
-            <div class="feature">
-                <h3>✈️ Лидери в авиацията</h3>
-                <p>SkyTickets е иновативна платформа, създадена да свързва пътешествениците с най-добрите дестинации по целия свят.</p>
+        <div class="features-grid">
+            <div class="feature-item">
+                <span class="feature-icon">🚀</span>
+                <div class="feature-title">Бързина</div>
+                <div class="feature-desc">Резервация на билет отнема по-малко от 2 минути. Без излишни стъпки.</div>
             </div>
-            <div class="feature">
-                <h3>🛡️ Сигурност и доверие</h3>
-                <p>Вашата сигурност е наш приоритет. Използваме най-съвременните технологии за защита на вашите данни и трансакции.</p>
+            <div class="feature-item">
+                <span class="feature-icon">🔒</span>
+                <div class="feature-title">Сигурност</div>
+                <div class="feature-desc">Вашите данни са защитени с най-модерните технологии за криптиране.</div>
             </div>
-            <div class="feature">
-                <h3>🌍 Глобално присъствие</h3>
-                <p>С над 500 дестинации и партньорства с водещи авиолинии, ние гарантираме качество на всяка стъпка от вашето пътуване.</p>
+            <div class="feature-item">
+                <span class="feature-icon">🌍</span>
+                <div class="feature-title">Глобалност</div>
+                <div class="feature-desc">Покриваме дестинации в цяла Европа и света. Светът е на един клик разстояние.</div>
             </div>
         </div>
     </div>
+
+    <div class="glass-card">
+        <h2>Нашата история</h2>
+        <p>
+            Стартирахме през 2026 година като малък стартъп с голяма мечта. Днес SkyTickets обслужва хиляди потребители, 
+            предоставяйки им най-лесния начин да стигнат от точка А до точка Б.
+        </p>
+        <p>
+            Ние сме екип от мечтатели, програмисти и пътешественици, обединени от страстта към авиацията.
+        </p>
+    </div>
+
+</div>
+
+<footer>
+    &copy; 2026 SkyTickets. Всички права запазени.
+</footer>
+
+<script type="module">
+    import { auth } from './firebase-config.js';
+    import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-auth.js";
+
+    onAuthStateChanged(auth, (user) => {
+        const userDisplay = document.getElementById('user-display');
+        if (user) {
+            userDisplay.innerText = user.email.split('@')[0];
+        } else {
+            userDisplay.innerHTML = '<a href="login.html" style="color:#a5b4fc; text-decoration:none;">Вход</a>';
+        }
+    });
+</script>
+
 </body>
 </html>
