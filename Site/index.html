@@ -9,6 +9,8 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <link rel="stylesheet" href="https://npmcdn.com/flatpickr/dist/themes/dark.css">
+    
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <style>
         :root {
@@ -19,344 +21,235 @@
             --glow: 0 0 20px rgba(118, 75, 162, 0.5);
             --text: #ffffff;
             --text-muted: #94a3b8;
+            --smart: #0abde3; --go: #302b63; --plus: #ff4757;
         }
 
         body { 
-            font-family: 'Outfit', sans-serif; 
-            margin: 0; color: var(--text);
+            font-family: 'Outfit', sans-serif; margin: 0; color: var(--text);
             background: linear-gradient(-45deg, #0f0c29, #302b63, #24243e, #1a1a2e);
-            background-size: 400% 400%;
-            animation: gradientBG 15s ease infinite;
-            min-height: 100vh;
+            background-size: 400% 400%; animation: gradientBG 15s ease infinite; min-height: 100vh;
         }
+        @keyframes gradientBG { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
 
-        @keyframes gradientBG {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
+        /* НАСТРОЙКИ НА ПРОЗОРЦИТЕ (Popups) */
+        div:where(.swal2-container) div:where(.swal2-popup) {
+            background: rgba(25, 25, 40, 0.95) !important;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.2);
+            color: white !important;
+            border-radius: 20px !important;
         }
+        div:where(.swal2-container) button.swal2-styled.swal2-confirm {
+            background: var(--accent) !important;
+            box-shadow: 0 0 15px rgba(102, 126, 234, 0.4);
+        }
+        div:where(.swal2-container) button.swal2-styled.swal2-cancel {
+            background: rgba(255,255,255,0.1) !important;
+        }
+        .swal2-title { font-family: 'Outfit', sans-serif !important; }
+        .swal2-html-container { color: #cbd5e1 !important; }
 
-        /* КАЛЕНДАР ДИЗАЙН */
-        .flatpickr-calendar {
-            background: rgba(15, 12, 41, 0.95) !important;
-            backdrop-filter: blur(15px) !important;
-            border: 1px solid rgba(255, 255, 255, 0.2) !important;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.5) !important;
-            font-family: 'Outfit', sans-serif !important;
-        }
-        .flatpickr-day.flatpickr-disabled { color: #475569 !important; opacity: 0.5; }
-        .flatpickr-day.enabled {
-            color: white !important; font-weight: 700 !important;
-            border-bottom: 2px solid #667eea; background: rgba(255,255,255,0.05);
-        }
-        .flatpickr-day.selected {
-            background: var(--accent) !important; border-color: transparent !important;
-            color: white !important; box-shadow: var(--glow);
-        }
+        /* Navigation */
+        .flatpickr-calendar { background: rgba(15, 12, 41, 0.95) !important; backdrop-filter: blur(15px); border: 1px solid rgba(255,255,255,0.2); font-family: 'Outfit', sans-serif; }
+        .flatpickr-day.selected { background: #667eea !important; border-color: transparent; }
 
-        /* НАВИГАЦИЯ */
-        nav { 
-            background: rgba(15, 12, 41, 0.6);
-            backdrop-filter: blur(12px);
-            height: 80px; padding: 0 8%;
-            display: flex; justify-content: space-between; align-items: center; 
-            border-bottom: 1px solid var(--border);
-        }
-        .logo { font-size: 26px; font-weight: 700; color: white; text-decoration: none; text-shadow: 0 0 15px rgba(255,255,255,0.2); }
+        nav { background: rgba(15, 12, 41, 0.6); backdrop-filter: blur(12px); height: 80px; padding: 0 8%; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); position: sticky; top:0; z-index: 100; }
+        .logo { font-size: 26px; font-weight: 700; color: white; text-decoration: none; }
         .nav-links a { text-decoration: none; color: var(--text-muted); margin-left: 25px; transition: 0.3s; font-weight: 500; }
-        .nav-links a:hover { color: white; text-shadow: 0 0 10px rgba(255,255,255,0.5); }
+        .nav-links a:hover { color: white; }
 
-        .hero { text-align: center; padding: 80px 20px 50px; }
-        .hero h1 { 
-            font-size: 52px; margin: 0; font-weight: 700; letter-spacing: -1px;
-            color: white; text-shadow: 0 0 20px rgba(165, 180, 252, 0.6);
-        }
+        .hero { text-align: center; padding: 60px 20px 40px; }
+        .hero h1 { font-size: 48px; margin: 0; font-weight: 700; color: white; text-shadow: 0 0 20px rgba(165, 180, 252, 0.6); }
 
-        /* ТЪРСАЧКА */
         .search-container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
-
-        .search-panel {
-            background: var(--glass-panel);
-            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-            border: 1px solid var(--border);
-            border-radius: 24px; padding: 30px;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-        }
-
+        .search-panel { background: var(--glass-panel); backdrop-filter: blur(20px); border: 1px solid var(--border); border-radius: 24px; padding: 30px; }
+        
         .trip-type { display: flex; gap: 25px; margin-bottom: 25px; }
-        .radio-group { 
-            display: flex; align-items: center; cursor: pointer; 
-            font-weight: 500; font-size: 15px; color: var(--text-muted); transition: 0.3s;
-        }
-        .radio-group:hover { color: white; }
-        .radio-group input { 
-            appearance: none; width: 18px; height: 18px; border: 2px solid #667eea; 
-            border-radius: 50%; margin-right: 10px; position: relative; cursor: pointer;
-        }
-        .radio-group input:checked { background: #667eea; box-shadow: 0 0 10px #667eea; }
+        .radio-group { display: flex; align-items: center; cursor: pointer; color: var(--text-muted); }
+        .radio-group input { margin-right: 10px; cursor: pointer; }
 
-        .search-grid {
-            display: grid;
-            grid-template-columns: 2fr 1fr 1fr 0.7fr auto;
-            gap: 15px; align-items: center;
-        }
-
-        .input-group-merged {
-            display: flex; background: var(--glass-input);
-            border: 1px solid var(--border); border-radius: 16px;
-            overflow: hidden; transition: 0.3s;
-        }
-        .input-group-merged:focus-within { border-color: #667eea; box-shadow: 0 0 15px rgba(102, 126, 234, 0.2); }
-
-        .input-wrapper { flex: 1; padding: 10px 20px; position: relative; }
-        .input-wrapper label { display: block; font-size: 12px; color: var(--text-muted); margin-bottom: 4px; text-transform: uppercase; letter-spacing: 1px; }
-        .input-wrapper input { 
-            width: 100%; border: none; background: transparent; outline: none; 
-            font-size: 16px; font-weight: 600; color: white; padding: 0; font-family: inherit;
-        }
-        .separator { width: 1px; background: var(--border); margin: 10px 0; }
-
-        .single-input {
-            background: var(--glass-input); border: 1px solid var(--border);
-            border-radius: 16px; padding: 10px 20px; height: 66px; 
-            display: flex; flex-direction: column; justify-content: center;
-            box-sizing: border-box; transition: 0.3s;
-        }
-        .single-input:focus-within { border-color: #667eea; box-shadow: 0 0 15px rgba(102, 126, 234, 0.2); }
-        .single-input label { font-size: 12px; color: var(--text-muted); display: block; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 1px;}
-        .single-input input { border: none; background: transparent; outline: none; font-size: 16px; font-weight: 600; color: white; width: 100%; font-family: inherit;}
-
-        .single-input.disabled {
-            opacity: 0.5; pointer-events: none; background: rgba(0,0,0,0.2);
-        }
-
-        .search-btn {
-            background: var(--accent); color: white; border: none;
-            padding: 0 35px; height: 66px; border-radius: 16px;
-            font-weight: 700; font-size: 16px; cursor: pointer;
-            box-shadow: var(--glow); transition: 0.3s;
-        }
-        .search-btn:hover { transform: translateY(-2px); filter: brightness(1.2); }
+        .search-grid { display: grid; grid-template-columns: 2fr 1fr 1fr 0.7fr auto; gap: 15px; align-items: center; }
+        .input-group-merged { display: flex; background: var(--glass-input); border: 1px solid var(--border); border-radius: 16px; overflow: hidden; }
+        .input-wrapper { flex: 1; padding: 10px 20px; border-right: 1px solid var(--border); }
+        .input-wrapper label { display: block; font-size: 12px; color: var(--text-muted); margin-bottom: 4px; text-transform: uppercase; }
+        .input-wrapper input { width: 100%; border: none; background: transparent; outline: none; font-size: 16px; color: white; }
+        .single-input { background: var(--glass-input); border: 1px solid var(--border); border-radius: 16px; padding: 10px 20px; height: 66px; display: flex; flex-direction: column; justify-content: center; }
+        .single-input label { font-size: 12px; color: var(--text-muted); display: block; margin-bottom: 4px; text-transform: uppercase; }
+        .single-input input { border: none; background: transparent; outline: none; font-size: 16px; color: white; width: 100%; }
+        .single-input.disabled { opacity: 0.5; pointer-events: none; }
+        .search-btn { background: var(--accent); color: white; border: none; padding: 0 35px; height: 66px; border-radius: 16px; font-weight: 700; cursor: pointer; box-shadow: var(--glow); }
 
         #flights-list { margin-top: 50px; }
-        .flight-card { 
-            background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(10px);
-            border: 1px solid var(--border); padding: 25px; border-radius: 20px; 
-            margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; 
-            transition: 0.3s;
-        }
-        .flight-card:hover { background: rgba(255,255,255,0.1); transform: translateY(-3px); border-color: rgba(255,255,255,0.3); }
-
-        .price-tag { font-size: 28px; font-weight: 700; color: white; text-align: right; text-shadow: 0 2px 10px rgba(0,0,0,0.5); }
-        .buy-btn { 
-            background: white; color: #302b63; border: none; padding: 10px 25px; 
-            border-radius: 10px; font-weight: 700; cursor: pointer; margin-top: 10px; transition: 0.3s;
-        }
+        .flight-card { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(10px); border: 1px solid var(--border); padding: 25px; border-radius: 20px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; }
+        .price-tag { font-size: 28px; font-weight: 700; text-align: right; }
+        .buy-btn { background: white; color: #302b63; border: none; padding: 10px 25px; border-radius: 10px; font-weight: 700; cursor: pointer; margin-top: 10px; transition: 0.3s; }
         .buy-btn:hover { background: #a5b4fc; transform: scale(1.05); }
 
-        @media (max-width: 1000px) {
-            .search-grid { grid-template-columns: 1fr; }
-            .separator { display: none; }
-            .input-group-merged { flex-direction: column; }
-            .input-wrapper { border-bottom: 1px solid var(--border); padding: 15px; }
-            .single-input, .search-btn { width: 100%; }
-        }
+        /* MODAL */
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(8px); z-index: 1000; justify-content: center; align-items: center; }
+        .modal-content { width: 90%; max-width: 1100px; animation: fadeIn 0.4s ease; }
+        .modal-header { text-align: center; margin-bottom: 30px; position: relative; }
+        .close-modal { position: absolute; top: -40px; right: 0; font-size: 30px; color: white; cursor: pointer; }
+        .tariffs-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+        .tariff-card { background: rgba(25, 25, 40, 0.9); border-radius: 16px; overflow: hidden; display: flex; flex-direction: column; border: 1px solid var(--border); transition: 0.3s; }
+        .tariff-card:hover { transform: translateY(-10px); }
+        .tariff-header { padding: 20px; text-align: center; color: white; }
+        .t-smart .tariff-header { background: var(--smart); } .t-go .tariff-header { background: var(--go); } .t-plus .tariff-header { background: var(--plus); }
+        .tariff-name { font-size: 22px; font-weight: 800; text-transform: uppercase; }
+        .tariff-body { padding: 30px 20px; flex: 1; display: flex; flex-direction: column; }
+        .feature-list { list-style: none; padding: 0; margin: 0 0 30px 0; flex: 1; }
+        .feature-list li { margin-bottom: 15px; font-size: 14px; color: #cbd5e1; display: flex; align-items: flex-start; }
+        .feature-list li::before { content: '✔'; margin-right: 10px; color: #2ed573; font-weight: bold; }
+        .tariff-price-box { text-align: center; margin-top: auto; background: rgba(255,255,255,0.05); padding: 15px; border-radius: 12px; }
+        .tariff-price { font-size: 24px; font-weight: 700; color: white; display: block; }
+        .select-btn { width: 100%; border: none; padding: 15px; margin-top: 15px; font-weight: 700; font-size: 16px; cursor: pointer; border-radius: 8px; transition: 0.3s; }
+        .t-smart .select-btn { background: var(--smart); color: white; } .t-go .select-btn { background: var(--go); color: white; border: 1px solid rgba(255,255,255,0.2); } .t-plus .select-btn { background: var(--plus); color: white; }
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+        @media (max-width: 900px) { .search-grid { grid-template-columns: 1fr; } .input-group-merged { flex-direction: column; } .single-input, .search-btn { width: 100%; } }
     </style>
 </head>
 <body>
 
 <nav>
-    <a href="index.html" class="logo">Sky<span>Tickets</span></a>
+    <a href="index.html" class="logo">SkyTickets</a>
     <div class="nav-links">
         <a href="aboutus.html">За нас</a>
-        <a href="contacts.html">Контакти</a>
         <a href="my-tickets.html">Моите билети</a>
-        <a href="admin.html" id="admin-btn" style="display: none;">Админ</a>
-        <span id="user-display" style="font-size: 14px; font-weight: 500; color: #a5b4fc; margin-left:15px;"></span>
+        <a href="contacts.html">Контакти</a> <a href="admin.html" id="admin-btn" style="display: none;">Админ</a>
+        <span id="user-display" style="font-size: 14px; margin-left:15px;"></span>
         <button id="btn-logout" style="display: none; background: rgba(255, 71, 87, 0.2); color:#ff4757; border:1px solid #ff4757; padding:5px 15px; border-radius:20px; margin-left:10px; cursor:pointer;">Изход</button>
     </div>
 </nav>
 
-<div class="hero">
-    <h1>Къде ще летим днес?</h1>
-</div>
+<div class="hero"><h1>Къде ще летим днес?</h1></div>
 
 <div class="search-container">
     <div class="search-panel">
-        
         <div class="trip-type">
-            <label class="radio-group">
-                <input type="radio" name="trip" value="round" checked onchange="toggleReturnDate()"> Двупосочен
-            </label>
-            <label class="radio-group">
-                <input type="radio" name="trip" value="oneway" onchange="toggleReturnDate()"> Еднопосочен
-            </label>
+            <label class="radio-group"><input type="radio" name="trip" value="round" checked onchange="toggleReturnDate()"> Двупосочен</label>
+            <label class="radio-group"><input type="radio" name="trip" value="oneway" onchange="toggleReturnDate()"> Еднопосочен</label>
         </div>
-
         <div class="search-grid">
             <div class="input-group-merged">
-                <div class="input-wrapper">
-                    <label>Откъде</label>
-                    <input type="text" id="search-from" placeholder="Напр. София">
-                </div>
-                <div class="separator"></div>
-                <div class="input-wrapper">
-                    <label>Накъде</label>
-                    <input type="text" id="search-to" placeholder="Напр. Лондон">
-                </div>
+                <div class="input-wrapper"><label>Откъде</label><input type="text" id="search-from" placeholder="Напр. София"></div>
+                <div class="input-wrapper"><label>Накъде</label><input type="text" id="search-to" placeholder="Напр. Лондон"></div>
             </div>
-
-            <div class="single-input">
-                <label>Отиване</label>
-                <input type="text" id="search-date" placeholder="Избери дата">
-            </div>
-
-            <div class="single-input" id="return-date-container">
-                <label>Връщане</label>
-                <input type="text" id="search-return-date" placeholder="Избери дата">
-            </div>
-
-            <div class="single-input">
-                <label>Пътници</label>
-                <input type="number" value="1" min="1">
-            </div>
-
+            <div class="single-input"><label>Отиване</label><input type="text" id="search-date" placeholder="Дата"></div>
+            <div class="single-input" id="return-date-container"><label>Връщане</label><input type="text" id="search-return-date" placeholder="Дата"></div>
+            <div class="single-input"><label>Пътници</label><input type="number" value="1" min="1"></div>
             <button class="search-btn" id="btn-search">Намери</button>
         </div>
     </div>
-
     <div id="flights-list"></div>
 </div>
 
-<footer>
-    <p style="text-align: center; color: var(--text-muted); margin-top: 50px;">&copy; 2026 SkyTickets. Design by You.</p>
-</footer>
+<div class="modal-overlay" id="baggage-modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Изберете вашата тарифа</h2>
+            <p style="color: #cbd5e1;">Добавете багаж и екстри към полета си</p>
+            <span class="close-modal" onclick="closeBaggageModal()">×</span>
+        </div>
+        <div class="tariffs-container">
+            <div class="tariff-card t-smart">
+                <div class="tariff-header"><div class="tariff-name">BASIC</div><div class="tariff-subtitle">Пътувай леко</div></div>
+                <div class="tariff-body">
+                    <ul class="feature-list"><li>🎒 Раница под седалката</li><li>❌ Без чекиран багаж</li><li>❌ Случайно място</li></ul>
+                    <div class="tariff-price-box"><span class="tariff-price" id="price-basic">-- €</span><button class="select-btn" onclick="selectTariff('Basic', 0)">Избери</button></div>
+                </div>
+            </div>
+            <div class="tariff-card t-go">
+                <div class="tariff-header"><div class="tariff-name">SMART</div><div class="tariff-subtitle">Балансиран избор</div></div>
+                <div class="tariff-body">
+                    <ul class="feature-list"><li>🎒 Раница</li><li>🧳 <strong>10 кг чекиран багаж</strong></li><li>💺 Стандартно място</li></ul>
+                    <div class="tariff-price-box"><span class="tariff-price" id="price-smart">-- €</span><button class="select-btn" onclick="selectTariff('Smart', 35)">Избери</button></div>
+                </div>
+            </div>
+            <div class="tariff-card t-plus">
+                <div class="tariff-header"><div class="tariff-name">PLUS</div><div class="tariff-subtitle">Всички екстри</div></div>
+                <div class="tariff-body">
+                    <ul class="feature-list"><li>🎒 Раница + Куфар</li><li>🧳 <strong>32 кг чекиран багаж</strong></li><li>👑 Премиум място</li></ul>
+                    <div class="tariff-price-box"><span class="tariff-price" id="price-plus">-- €</span><button class="select-btn" onclick="selectTariff('Plus', 85)">Избери</button></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<footer><p style="text-align: center; color: var(--text-muted); margin-top: 50px;">&copy; 2026 SkyTickets.</p></footer>
 
 <script type="module">
     import { auth, db } from './firebase-config.js';
     import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-auth.js";
     import { collection, getDocs, doc, updateDoc, getDoc, addDoc } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-firestore.js";
 
-    // Глобални променливи
-    let allFlightsData = []; 
-    let departureCalendar;   
-    let returnCalendar;      
+    // --- НАШИЯТ СОБСТВЕН UI (За да не виждаш Swal) ---
+    const UI = {
+        success: (title, msg) => Swal.fire({ title: title, text: msg, icon: 'success', confirmButtonText: 'Супер' }),
+        error: (title, msg) => Swal.fire({ title: title, text: msg, icon: 'error', confirmButtonText: 'Ок' }),
+        warning: (title, msg) => Swal.fire({ title: title, text: msg, icon: 'warning', confirmButtonText: 'Разбрах' }),
+        loading: () => Swal.fire({ title: 'Обработване...', text: 'Моля изчакайте', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); } }),
+        confirm: (title, html) => Swal.fire({
+            title: title, html: html, icon: 'question',
+            showCancelButton: true, confirmButtonText: 'Потвърди', cancelButtonText: 'Отказ'
+        })
+    };
 
-    // --- 1. ИНИЦИАЛИЗАЦИЯ ---
+    let allFlightsData = []; let departureCalendar; let returnCalendar;      
+    let selectedFlightId = null; let selectedFlightBasePrice = 0;
+
     async function initApp() {
-        console.log("Стартиране...");
-        
-        // Създаваме календарите
-        departureCalendar = flatpickr("#search-date", {
-            dateFormat: "Y-m-d",
-            minDate: "today",
-            locale: { firstDayOfWeek: 1 },
-            disableMobile: "true"
-        });
+        departureCalendar = flatpickr("#search-date", { dateFormat: "Y-m-d", minDate: "today", locale: { firstDayOfWeek: 1 }, disableMobile: "true" });
+        returnCalendar = flatpickr("#search-return-date", { dateFormat: "Y-m-d", minDate: "today", disableMobile: "true" });
 
-        returnCalendar = flatpickr("#search-return-date", {
-            dateFormat: "Y-m-d",
-            minDate: "today",
-            disableMobile: "true"
-        });
-
-        // Дърпаме всички полети веднъж
         try {
             const querySnapshot = await getDocs(collection(db, "flights"));
             allFlightsData = []; 
-
             querySnapshot.forEach((doc) => {
                 const data = doc.data();
                 allFlightsData.push({
                     id: doc.id,
-                    from: data.from.toLowerCase().trim(),
-                    to: data.to.toLowerCase().trim(),
-                    date: data.date,       
-                    returnDate: data.returnDate, 
-                    seats: data.seats,
-                    type: data.type || 'oneway',
-                    price: data.price,
-                    // Взимаме часовете
-                    depTime: data.depTime || "00:00",
-                    arrTime: data.arrTime || "00:00"
+                    from: data.from.toLowerCase().trim(), to: data.to.toLowerCase().trim(),
+                    date: data.date, returnDate: data.returnDate, seats: data.seats,
+                    type: data.type || 'oneway', price: data.price,
+                    depTime: data.depTime || "00:00", arrTime: data.arrTime || "00:00"
                 });
             });
+            updateCalendarDates(); 
+        } catch (e) { console.error(e); }
 
-            console.log("Заредени полети:", allFlightsData.length);
-            updateCalendarDates(); // Обновяваме (ще скрие всичко, ако е празно)
-
-        } catch (e) {
-            console.error("Грешка при зареждане:", e);
-        }
-
-        // Слушатели за писане в полетата
         document.getElementById('search-from').addEventListener('input', updateCalendarDates);
         document.getElementById('search-to').addEventListener('input', updateCalendarDates);
-        
-        // Слушатели за смяна на типа билет
-        const radioButtons = document.querySelectorAll('input[name="trip"]');
-        radioButtons.forEach(radio => {
-            radio.addEventListener('change', () => {
-                toggleReturnDate();
-                updateCalendarDates();
-                displayFlights();
-            });
+        document.querySelectorAll('input[name="trip"]').forEach(radio => {
+            radio.addEventListener('change', () => { toggleReturnDate(); updateCalendarDates(); displayFlights(); });
         });
     }
 
-    // --- 2. УМНИ КАЛЕНДАРИ (СТРИКТНА ЛОГИКА) ---
     function updateCalendarDates() {
         const fromInput = document.getElementById('search-from').value.toLowerCase().trim();
         const toInput = document.getElementById('search-to').value.toLowerCase().trim();
         const selectedType = document.querySelector('input[name="trip"]:checked').value;
 
-        // АКО ПОНЕ ЕДНО ПОЛЕ Е ПРАЗНО -> СКРИВАМЕ ВСИЧКО
-        if (fromInput === "" || toInput === "") {
-            departureCalendar.set('enable', []); 
-            returnCalendar.set('enable', []);
-            return; 
-        }
+        if (fromInput === "" || toInput === "") { departureCalendar.set('enable', []); returnCalendar.set('enable', []); return; }
 
-        // Филтрираме
         const matchingFlights = allFlightsData.filter(flight => {
             if (flight.seats <= 0) return false;
             if (flight.type !== selectedType) return false;
-            
-            const matchFrom = flight.from.includes(fromInput);
-            const matchTo = flight.to.includes(toInput);
-            
-            return matchFrom && matchTo;
+            return flight.from.includes(fromInput) && flight.to.includes(toInput);
         });
 
-        // Вадим датите
-        const validDepartureDates = matchingFlights.map(f => f.date);
-        const validReturnDates = matchingFlights.filter(f => f.returnDate).map(f => f.returnDate);
-
-        // Обновяваме календарите
-        if (validDepartureDates.length > 0) departureCalendar.set('enable', validDepartureDates);
-        else departureCalendar.set('enable', []);
-
-        if (validReturnDates.length > 0) returnCalendar.set('enable', validReturnDates);
-        else returnCalendar.set('enable', []);
+        const validDep = matchingFlights.map(f => f.date);
+        const validRet = matchingFlights.filter(f => f.returnDate).map(f => f.returnDate);
+        departureCalendar.set('enable', validDep); returnCalendar.set('enable', validRet);
     }
 
-    // --- 3. СКРИВАНЕ НА "ВРЪЩАНЕ" ---
     window.toggleReturnDate = () => {
         const isOneWay = document.querySelector('input[name="trip"][value="oneway"]').checked;
-        const returnContainer = document.getElementById('return-date-container');
-        const returnInput = document.getElementById('search-return-date');
-
-        if (isOneWay) {
-            returnContainer.classList.add('disabled');
-            returnInput.disabled = true;
-            returnInput.value = ""; 
-        } else {
-            returnContainer.classList.remove('disabled');
-            returnInput.disabled = false;
-        }
+        const div = document.getElementById('return-date-container'); const inp = document.getElementById('search-return-date');
+        if (isOneWay) { div.classList.add('disabled'); inp.disabled = true; inp.value = ""; } 
+        else { div.classList.remove('disabled'); inp.disabled = false; }
     };
 
-    // --- 4. ТЪРСЕНЕ И ПОКАЗВАНЕ ---
     window.displayFlights = async () => { 
         const fromCity = document.getElementById('search-from').value.toLowerCase().trim();
         const toCity = document.getElementById('search-to').value.toLowerCase().trim();
@@ -366,62 +259,71 @@
         const flightsList = document.getElementById('flights-list');
         
         flightsList.innerHTML = "<p style='text-align:center; color: #a5b4fc;'>Търсене...</p>";
-        
-        let hasFlights = false;
-        flightsList.innerHTML = ""; 
+        let hasFlights = false; flightsList.innerHTML = ""; 
 
         allFlightsData.forEach((f) => {
             const matchFrom = fromCity === "" || f.from.includes(fromCity);
             const matchTo = toCity === "" || f.to.includes(toCity);
             const matchDate = dateInput === "" || f.date === dateInput;
-            
-            let matchReturnDate = true;
-            if (selectedType === 'round' && returnDateInput !== "") matchReturnDate = f.returnDate === returnDateInput;
-
+            let matchReturn = true; if (selectedType === 'round' && returnDateInput !== "") matchReturn = f.returnDate === returnDateInput;
             const matchType = f.type === selectedType;
 
-            if (matchFrom && matchTo && matchDate && matchReturnDate && matchType && f.seats > 0) {
+            if (matchFrom && matchTo && matchDate && matchReturn && matchType && f.seats > 0) {
                 hasFlights = true;
-                
-                let returnHtml = '';
-                if (f.type === 'round' && f.returnDate) {
-                    returnHtml = ` | <span style="color:#ffcc00">🔙 ${f.returnDate}</span>`;
-                }
-
-                // ВГРАЖДАМЕ И ЧАСОВЕТЕ
+                let returnHtml = (f.type === 'round' && f.returnDate) ? ` | <span style="color:#ffcc00">🔙 ${f.returnDate}</span>` : '';
                 flightsList.innerHTML += `
                     <div class="flight-card">
                         <div class="flight-info">
-                            <h3 style="margin:0; font-size:22px;">
-                                ${f.from.toUpperCase()} <span style="color:#667eea">✈</span> ${f.to.toUpperCase()}
-                            </h3>
-                            
-                            <div style="font-size: 18px; font-weight: 700; margin: 8px 0; color: white;">
-                                ${f.depTime} <span style="font-weight:300; font-size:14px; opacity:0.7">➜</span> ${f.arrTime}
-                            </div>
-
-                            <div style="font-size:14px; color:#cbd5e1;">
-                                📅 ${f.date} ${returnHtml} &nbsp;|&nbsp; 💺 ${f.seats} места
-                            </div>
+                            <h3 style="margin:0; font-size:22px;">${f.from.toUpperCase()} <span style="color:#667eea">✈</span> ${f.to.toUpperCase()}</h3>
+                            <div style="font-size: 18px; font-weight: 700; margin: 8px 0; color: white;">${f.depTime} <span style="font-weight:300; font-size:14px; opacity:0.7">➜</span> ${f.arrTime}</div>
+                            <div style="font-size:14px; color:#cbd5e1;">📅 ${f.date} ${returnHtml} &nbsp;|&nbsp; 💺 ${f.seats} места</div>
                         </div>
                         <div>
-                            <div class="price-tag">${f.price} € </div>
-                            <button onclick="buyTicket('${f.id}')" class="buy-btn">Купи</button>
+                            <div class="price-tag">${f.price} €</div>
+                            <button onclick="openBaggageModal('${f.id}', ${f.price})" class="buy-btn">Избери</button>
                         </div>
                     </div>`;
             }
         });
+        if (!hasFlights) flightsList.innerHTML = "<div style='text-align:center; padding:30px; background: rgba(255,255,255,0.05); border-radius:16px;'>Няма полети.</div>";
+    };
 
-        if (!hasFlights) {
-            flightsList.innerHTML = "<div style='text-align:center; padding:30px; background: rgba(255,255,255,0.05); border-radius:16px;'>Няма намерени полети.</div>";
+    window.openBaggageModal = (flightId, basePrice) => {
+        const user = auth.currentUser;
+        if (!user) { 
+            UI.warning('Внимание', 'Моля, влезте в профила си, за да резервирате!');
+            return; 
+        }
+        selectedFlightId = flightId; selectedFlightBasePrice = basePrice;
+        document.getElementById('price-basic').innerText = `+ 0 €`;
+        document.getElementById('price-smart').innerText = `+ 35 €`;
+        document.getElementById('price-plus').innerText = `+ 85 €`;
+        document.getElementById('baggage-modal').style.display = 'flex';
+    };
+
+    window.closeBaggageModal = () => { document.getElementById('baggage-modal').style.display = 'none'; selectedFlightId = null; };
+
+    // --- КРАСИВ ДИАЛОГ ЗА ПОКУПКА ---
+    window.selectTariff = async (tariffName, extraPrice) => {
+        const finalPrice = selectedFlightBasePrice + extraPrice;
+        
+        const result = await UI.confirm('Потвърдете покупката', `
+            <div style="text-align:left; background:rgba(255,255,255,0.05); padding:15px; border-radius:10px;">
+                <p>Тарифа: <strong>${tariffName}</strong></p>
+                <p>Крайна цена: <strong style="color:#2ed573; font-size:20px;">${finalPrice} €</strong></p>
+            </div>
+        `);
+
+        if (result.isConfirmed) {
+            await finalizePurchase(selectedFlightId, tariffName, finalPrice);
+            closeBaggageModal();
         }
     };
 
-    // --- 5. КУПУВАНЕ ---
-    window.buyTicket = async (flightId) => {
+    async function finalizePurchase(flightId, tariffName, totalPrice) {
+        UI.loading(); // Показваме "Зареждане..."
+        
         const user = auth.currentUser;
-        if (!user) { alert("Моля, влезте в профила си!"); return; }
-
         const flightRef = doc(db, "flights", flightId);
         try {
             const flightSnap = await getDoc(flightRef);
@@ -429,55 +331,49 @@
             const flightData = flightSnap.data();
 
             if (flightData.seats > 0) {
-                const newSeats = flightData.seats - 1;
                 await addDoc(collection(db, "orders"), {
-                    userId: user.uid,
-                    userEmail: user.email,
-                    flightId: flightId,
-                    flightTo: flightData.to,
-                    flightFrom: flightData.from,
-                    date: flightData.date,
-                    type: flightData.type,
-                    price: flightData.price,
+                    userId: user.uid, userEmail: user.email, flightId: flightId,
+                    flightTo: flightData.to, flightFrom: flightData.from, date: flightData.date,
+                    type: flightData.type, price: totalPrice, tariff: tariffName,
                     purchaseDate: new Date().toLocaleDateString()
                 });
+                await updateDoc(flightRef, { seats: flightData.seats - 1 });
                 
-                await updateDoc(flightRef, { seats: newSeats });
-                alert("Успешна резервация!");
-                initApp(); 
-                setTimeout(displayFlights, 500); 
-            } else {
-                alert("Местата свършиха!");
+                UI.success('Готово!', 'Успешна резервация!');
+                initApp(); setTimeout(displayFlights, 500); 
+            } else { 
+                UI.error('Грешка', 'Местата свършиха!');
             }
         } catch (e) { console.error(e); }
-    };
+    }
 
-    document.getElementById('btn-search').onclick = displayFlights;
-
-    // --- 6. AUTH STATE ---
-    onAuthStateChanged(auth, async (user) => {
-        const userDisplay = document.getElementById('user-display');
-        const logoutBtn = document.getElementById('btn-logout');
-        const adminBtn = document.getElementById('admin-btn');
+   onAuthStateChanged(auth, async (user) => {
+        const d = document.getElementById('user-display');
+        const out = document.getElementById('btn-logout');
+        const adm = document.getElementById('admin-btn');
 
         if (user) {
-            userDisplay.innerText = user.email.split('@')[0];
-            logoutBtn.style.display = "inline-block";
-            try {
-                const userDoc = await getDoc(doc(db, "users", user.uid));
-                if (userDoc.exists() && userDoc.data().role === "admin") adminBtn.style.display = "inline-block";
+            // ТОВА Е ПРОМЯНАТА: Правим го на ЛИНК (innerHTML) вместо само текст
+            d.innerHTML = `<a href="profile.html" style="color:#a5b4fc; text-decoration:none; font-weight:bold;">👤 ${user.email.split('@')[0]}</a>`;
+            
+            out.style.display = "inline-block";
+            
+            // Проверка за админ права
+            try { 
+                const u = await getDoc(doc(db, "users", user.uid)); 
+                if (u.exists() && u.data().role === "admin") adm.style.display = "inline-block"; 
             } catch(e) {}
+
         } else {
-            userDisplay.innerHTML = '<a href="login.html" style="color:#a5b4fc; text-decoration:none;">Вход</a>';
-            logoutBtn.style.display = "none";
-            adminBtn.style.display = "none";
+            // Ако не е влязъл - показваме бутон "Вход"
+            d.innerHTML = '<a href="login.html" style="color:#a5b4fc; text-decoration:none;">Вход</a>';
+            out.style.display = "none";
+            adm.style.display = "none";
         }
-        
-        initApp();
+
+        initApp(); 
         setTimeout(displayFlights, 1000);
     });
-
-    document.getElementById('btn-logout').onclick = () => signOut(auth).then(() => location.reload());
 </script>
 
 </body>

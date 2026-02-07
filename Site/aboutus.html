@@ -157,13 +157,32 @@
     import { auth } from './firebase-config.js';
     import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-auth.js";
 
-    onAuthStateChanged(auth, (user) => {
-        const userDisplay = document.getElementById('user-display');
+   onAuthStateChanged(auth, async (user) => {
+        const d = document.getElementById('user-display');
+        const out = document.getElementById('btn-logout');
+        const adm = document.getElementById('admin-btn');
+
         if (user) {
-            userDisplay.innerText = user.email.split('@')[0];
+            // ТОВА Е ПРОМЯНАТА: Правим го на ЛИНК (innerHTML) вместо само текст
+            d.innerHTML = `<a href="profile.html" style="color:#a5b4fc; text-decoration:none; font-weight:bold;">👤 ${user.email.split('@')[0]}</a>`;
+            
+            out.style.display = "inline-block";
+            
+            // Проверка за админ права
+            try { 
+                const u = await getDoc(doc(db, "users", user.uid)); 
+                if (u.exists() && u.data().role === "admin") adm.style.display = "inline-block"; 
+            } catch(e) {}
+
         } else {
-            userDisplay.innerHTML = '<a href="login.html" style="color:#a5b4fc; text-decoration:none;">Вход</a>';
+            // Ако не е влязъл - показваме бутон "Вход"
+            d.innerHTML = '<a href="login.html" style="color:#a5b4fc; text-decoration:none;">Вход</a>';
+            out.style.display = "none";
+            adm.style.display = "none";
         }
+
+        initApp(); 
+        setTimeout(displayFlights, 1000);
     });
 </script>
 

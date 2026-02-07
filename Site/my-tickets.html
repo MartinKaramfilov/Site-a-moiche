@@ -7,6 +7,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;700&display=swap" rel="stylesheet">
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <style>
         :root {
@@ -33,6 +35,18 @@
             100% { background-position: 0% 50%; }
         }
 
+        /* SWEETALERT STYLES */
+        div:where(.swal2-container) div:where(.swal2-popup) {
+            background: rgba(25, 25, 40, 0.95) !important;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.2);
+            color: white !important;
+            border-radius: 20px !important;
+        }
+        div:where(.swal2-container) button.swal2-styled.swal2-confirm { background: #ff4757 !important; }
+        div:where(.swal2-container) button.swal2-styled.swal2-cancel { background: rgba(255,255,255,0.1) !important; }
+
+        /* НАВИГАЦИЯ */
         nav { 
             background: rgba(15, 12, 41, 0.6);
             backdrop-filter: blur(12px);
@@ -41,84 +55,65 @@
             border-bottom: 1px solid var(--border);
         }
         .logo { font-size: 26px; font-weight: 700; color: white; text-decoration: none; }
-        .nav-links a { text-decoration: none; color: var(--text-dim); margin-left: 25px; transition: 0.3s; font-weight: 500; }
+        .nav-links { display: flex; align-items: center; gap: 20px; }
+        .nav-links a { text-decoration: none; color: var(--text-dim); transition: 0.3s; font-weight: 500; }
         .nav-links a:hover { color: white; }
 
+        /* СПЕЦИАЛЕН БУТОН ИЗХОД */
+        #btn-logout {
+            width: auto; margin: 0; padding: 8px 20px; font-size: 14px;
+            background: rgba(255, 71, 87, 0.2); color: #ff4757; 
+            border: 1px solid #ff4757; border-radius: 20px; cursor: pointer;
+        }
+        #btn-logout:hover { background: #ff4757; color: white; }
+
+        /* КОНТЕЙНЕР */
         .container { max-width: 900px; margin: 60px auto; padding: 0 20px; }
         h1 { text-align: center; margin-bottom: 40px; text-shadow: 0 0 20px rgba(165, 180, 252, 0.5); }
 
-        /* КАРТА БИЛЕТ */
+        /* БИЛЕТИ */
         .ticket-card {
-            background: var(--glass);
-            backdrop-filter: blur(16px);
-            border: 1px solid var(--border);
-            border-radius: 24px;
-            padding: 0;
-            margin-bottom: 25px;
-            display: flex;
-            overflow: hidden;
-            position: relative;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-            transition: 0.3s;
+            background: var(--glass); backdrop-filter: blur(16px);
+            border: 1px solid var(--border); border-radius: 24px;
+            padding: 0; margin-bottom: 25px;
+            display: flex; overflow: hidden; position: relative;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3); transition: 0.3s;
         }
         .ticket-card:hover { transform: translateY(-5px); }
 
-        /* ЛЯВА ЧАСТ */
-        .ticket-info {
-            padding: 30px;
-            flex: 1;
-            border-right: 2px dashed rgba(255,255,255,0.2);
-            position: relative;
+        .ticket-info { padding: 30px; flex: 1; border-right: 2px dashed rgba(255,255,255,0.2); position: relative; }
+        .ticket-info::before, .ticket-info::after { 
+            content: ''; position: absolute; right: -10px; width: 20px; height: 20px; 
+            background: #1a1a2e; border-radius: 50%; 
         }
-        .ticket-info::before, .ticket-info::after {
-            content: ''; position: absolute; right: -10px; width: 20px; height: 20px;
-            background: #1a1a2e; border-radius: 50%;
-        }
-        .ticket-info::before { top: -10px; }
+        .ticket-info::before { top: -10px; } 
         .ticket-info::after { bottom: -10px; }
 
         .route { font-size: 24px; font-weight: 700; margin-bottom: 10px; }
         .flight-time { font-size: 28px; font-weight: 700; color: #a5b4fc; margin-bottom: 5px; }
         .dates { font-size: 14px; color: var(--text-dim); margin-bottom: 20px; }
-        
-        .badge {
-            display: inline-block; padding: 5px 10px; border-radius: 6px; 
-            font-size: 12px; font-weight: 700; text-transform: uppercase;
-            background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2);
-        }
+        .badge { display: inline-block; padding: 5px 10px; border-radius: 6px; font-size: 12px; font-weight: 700; text-transform: uppercase; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); }
 
-        /* ДЯСНА ЧАСТ */
-        .ticket-action {
-            width: 220px;
-            display: flex; flex-direction: column; 
-            justify-content: center; align-items: center;
-            background: rgba(0,0,0,0.2);
-            padding: 20px;
+        .ticket-action { 
+            width: 220px; display: flex; flex-direction: column; 
+            justify-content: center; align-items: center; 
+            background: rgba(0,0,0,0.2); padding: 20px; 
         }
-
         .price { font-size: 28px; font-weight: 700; margin-bottom: 15px; }
+        .qr-box { background: white; padding: 10px; border-radius: 8px; margin-bottom: 20px; }
         
-        /* КОНТЕЙНЕР ЗА QR КОДА */
-        .qr-box {
-            background: white; /* QR кодът трябва да е на бял фон, за да се чете */
-            padding: 10px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-        }
-
-        .cancel-btn {
+        .cancel-btn { 
             background: rgba(255, 71, 87, 0.15); color: #ff4757; 
-            border: 1px solid #ff4757; padding: 8px 20px; border-radius: 20px; 
-            cursor: pointer; transition: 0.3s; font-weight: 600; font-size: 14px;
+            border: 1px solid #ff4757; padding: 8px 20px; 
+            border-radius: 20px; cursor: pointer; transition: 0.3s; 
+            font-weight: 600; font-size: 14px; 
         }
         .cancel-btn:hover { background: #ff4757; color: white; }
 
         @media (max-width: 700px) {
             .ticket-card { flex-direction: column; }
             .ticket-info { border-right: none; border-bottom: 2px dashed rgba(255,255,255,0.2); }
-            .ticket-info::before { top: auto; bottom: -10px; left: -10px; right: auto; }
-            .ticket-info::after { top: auto; bottom: -10px; right: -10px; }
-            .ticket-action { width: 100%; padding: 30px; }
+            .ticket-action { width: 100%; padding: 30px; box-sizing: border-box; }
         }
     </style>
 </head>
@@ -130,7 +125,10 @@
         <a href="index.html">Търсене</a>
         <a href="aboutus.html">За нас</a>
         <a href="contacts.html">Контакти</a>
-        <span id="user-display" style="font-size: 14px; font-weight: 500; color: #a5b4fc; margin-left:15px;"></span>
+
+        <a href="admin.html" id="admin-btn" style="display: none;">Админ</a>
+        <span id="user-display" style="font-size: 14px;"></span>
+        <button id="btn-logout" style="display: none;">Изход</button>
     </div>
 </nav>
 
@@ -141,123 +139,170 @@
 
 <script type="module">
     import { auth, db } from './firebase-config.js';
-    import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-auth.js";
+    import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-auth.js";
     import { collection, query, where, getDocs, doc, deleteDoc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-firestore.js";
 
+    // UI Helper
+    const UI = {
+        success: (title, msg) => Swal.fire({ title: title, text: msg, icon: 'success', confirmButtonText: 'Супер' }),
+        error: (title, msg) => Swal.fire({ title: title, text: msg, icon: 'error', confirmButtonText: 'Ок' }),
+        confirm: (title, text) => Swal.fire({
+            title: title, text: text, icon: 'warning',
+            showCancelButton: true, confirmButtonText: 'Да, върни билета', cancelButtonText: 'Отказ'
+        })
+    };
+
     onAuthStateChanged(auth, async (user) => {
-        if (!user) { window.location.href = "login.html"; return; }
-        document.getElementById('user-display').innerText = user.email.split('@')[0];
-        loadTickets(user.uid);
+        const d = document.getElementById('user-display');
+        const out = document.getElementById('btn-logout');
+        const adm = document.getElementById('admin-btn');
+
+        if (user) {
+            // 1. Навигация
+            d.innerHTML = `<a href="profile.html" style="color:#a5b4fc; text-decoration:none; font-weight:bold;">👤 ${user.email.split('@')[0]}</a>`;
+            out.style.display = "block";
+            
+            try { 
+                const u = await getDoc(doc(db, "users", user.uid)); 
+                if (u.exists() && u.data().role === "admin") adm.style.display = "block"; 
+            } catch(e) {}
+
+            // 2. Зареждане на билети
+            loadTickets(user.uid);
+
+        } else {
+            // Ако не е влязъл, пращаме го да влезе
+            window.location.href = "login.html";
+        }
     });
 
     async function loadTickets(userId) {
         const container = document.getElementById('tickets-container');
         container.innerHTML = "<p style='text-align:center'>Зареждане на билети...</p>";
+        
+        try {
+            // Търсим поръчки за ТОЗИ потребител
+            const q = query(collection(db, "orders"), where("userId", "==", userId));
+            const querySnapshot = await getDocs(q);
 
-        const q = query(collection(db, "orders"), where("userId", "==", userId));
-        const querySnapshot = await getDocs(q);
+            if (querySnapshot.empty) { 
+                container.innerHTML = "<div style='text-align:center; padding:40px; opacity:0.7; background:rgba(255,255,255,0.05); border-radius:20px;'>Все още нямате закупени билети. <br><a href='index.html' style='color:#a5b4fc; margin-top:10px; display:inline-block;'>Намери полет</a></div>"; 
+                return; 
+            }
 
-        if (querySnapshot.empty) {
-            container.innerHTML = "<div style='text-align:center; padding:40px; opacity:0.7;'>Все още нямате закупени билети.</div>";
-            return;
-        }
+            container.innerHTML = ""; 
+            let ticketsData = [];
 
-        container.innerHTML = ""; 
+            // Обхождаме всички намерени билети
+            for (const orderDoc of querySnapshot.docs) {
+                const order = orderDoc.data();
+                const orderId = orderDoc.id;
+                
+                let depTime = "??:??"; 
+                let arrTime = "??:??"; 
+                let returnDateInfo = "";
 
-        // 1. Първо генерираме HTML за всички билети
-        // Ще запазим данните в масив, за да генерираме QR кодовете ПОСЛЕ
-        let ticketsData = [];
-
-        for (const orderDoc of querySnapshot.docs) {
-            const order = orderDoc.data();
-            const orderId = orderDoc.id;
-
-            let depTime = "??:??";
-            let arrTime = "??:??";
-            let returnDateInfo = "";
-
-            try {
-                const flightRef = doc(db, "flights", order.flightId);
-                const flightSnap = await getDoc(flightRef);
-                if (flightSnap.exists()) {
-                    const fData = flightSnap.data();
-                    depTime = fData.depTime || "00:00";
-                    arrTime = fData.arrTime || "00:00";
-                    if (order.type === 'round' && fData.returnDate) {
-                        returnDateInfo = ` | 🔙 Връщане: ${fData.returnDate}`;
+                // Опитваме се да намерим информация за полета
+                try {
+                    const flightRef = doc(db, "flights", order.flightId);
+                    const flightSnap = await getDoc(flightRef);
+                    
+                    if (flightSnap.exists()) {
+                        const fData = flightSnap.data();
+                        depTime = fData.depTime || "00:00"; 
+                        arrTime = fData.arrTime || "00:00";
+                        if (order.type === 'round' && fData.returnDate) {
+                            returnDateInfo = ` | 🔙 Връщане: ${fData.returnDate}`;
+                        }
+                    } else {
+                        // Ако полетът е изтрит от админа, но билетът стои
+                        depTime = "--:--";
+                        arrTime = "--:--";
+                        returnDateInfo = " (Архивиран полет)";
                     }
-                }
-            } catch (e) { console.log("Грешка полет", e); }
+                } catch (e) { console.log("Грешка при полет: " + e); }
 
-            let typeBadge = order.type === 'round' 
-                ? '<span class="badge" style="background: #667eea; color:white;">ДВУПОСОЧЕН</span>' 
-                : '<span class="badge">ЕДНОПОСОЧЕН</span>';
+                let typeBadge = order.type === 'round' 
+                    ? '<span class="badge" style="background: #667eea; color:white;">ДВУПОСОЧЕН</span>' 
+                    : '<span class="badge">ЕДНОПОСОЧЕН</span>';
+                
+                let tariffBadge = order.tariff 
+                    ? `<div style="font-size:12px; color:#2ed573; margin-top:5px;">Тарифа: ${order.tariff}</div>` 
+                    : '';
+                
+                ticketsData.push(orderId);
 
-            // Запазваме ID-то за QR кода
-            ticketsData.push(orderId);
-
-            container.innerHTML += `
-                <div class="ticket-card">
-                    <div class="ticket-info">
-                        ${typeBadge}
-                        <div class="route" style="margin-top:10px;">
-                            ${order.flightFrom} ➔ ${order.flightTo}
+                // Добавяме HTML картата
+                container.innerHTML += `
+                    <div class="ticket-card">
+                        <div class="ticket-info">
+                            ${typeBadge}
+                            <div class="route" style="margin-top:10px;">${order.flightFrom} ➔ ${order.flightTo}</div>
+                            <div class="flight-time">${depTime} <span style="font-size:16px; opacity:0.6">➜</span> ${arrTime}</div>
+                            <div class="dates">📅 Дата: ${order.date} ${returnDateInfo}</div>
+                            ${tariffBadge}
+                            <div style="font-size:12px; opacity:0.5; margin-top:5px;">Ticket ID: #${orderId}</div>
                         </div>
-                        <div class="flight-time">
-                            ${depTime} <span style="font-size:16px; opacity:0.6">➜</span> ${arrTime}
-                        </div>
-                        <div class="dates">
-                            📅 Дата: ${order.date} ${returnDateInfo}
-                        </div>
-                        <div style="font-size:12px; opacity:0.5;">
-                            Ticket ID: #${orderId}
+                        <div class="ticket-action">
+                            <div class="price">${order.price} €</div>
+                            <div class="qr-box" id="qrcode-${orderId}"></div>
+                            <button class="cancel-btn" onclick="cancelTicket('${orderId}', '${order.flightId}')">Отказ</button>
                         </div>
                     </div>
-                    <div class="ticket-action">
-                        <div class="price">${order.price} €</div>
-                        
-                        <div class="qr-box" id="qrcode-${orderId}"></div>
-                        
-                        <button class="cancel-btn" onclick="cancelTicket('${orderId}', '${order.flightId}')">Отказ</button>
-                    </div>
-                </div>
-            `;
+                `;
+            }
+
+            // Генерираме QR кодовете малко след като HTML-ът е готов
+            setTimeout(() => {
+                ticketsData.forEach(id => {
+                    const qrContainer = document.getElementById(`qrcode-${id}`);
+                    if (qrContainer) {
+                        qrContainer.innerHTML = ""; // Чистим ако има стар
+                        new QRCode(qrContainer, { 
+                            text: id, 
+                            width: 80, 
+                            height: 80, 
+                            colorDark : "#000000", 
+                            colorLight : "#ffffff", 
+                            correctLevel : QRCode.CorrectLevel.H 
+                        });
+                    }
+                });
+            }, 100);
+
+        } catch (error) {
+            console.error("Грешка при зареждане:", error);
+            container.innerHTML = "<p>Грешка при връзката с базата данни.</p>";
         }
-
-        // 2. След като HTML-ът е готов, генерираме QR кодовете
-        // Библиотеката има нужда елементът вече да съществува в DOM дървото
-        setTimeout(() => {
-            ticketsData.forEach(id => {
-                const qrContainer = document.getElementById(`qrcode-${id}`);
-                if (qrContainer) {
-                    // Генерираме код с ID-то на поръчката
-                    new QRCode(qrContainer, {
-                        text: id, // Това е уникалният код!
-                        width: 80,
-                        height: 80,
-                        colorDark : "#000000",
-                        colorLight : "#ffffff",
-                        correctLevel : QRCode.CorrectLevel.H
-                    });
-                }
-            });
-        }, 100);
     }
 
+    // Функция за отказ на билет
     window.cancelTicket = async (orderId, flightId) => {
-        if(!confirm("Сигурни ли сте, че искате да върнете този билет?")) return;
-        try {
-            const flightRef = doc(db, "flights", flightId);
-            const flightSnap = await getDoc(flightRef);
-            if (flightSnap.exists()) {
-                const currentSeats = flightSnap.data().seats;
-                await updateDoc(flightRef, { seats: currentSeats + 1 });
+        const result = await UI.confirm('Сигурни ли сте?', "Искате да върнете този билет? Действието е окончателно!");
+
+        if (result.isConfirmed) {
+            try {
+                // 1. Опитваме се да върнем мястото в полета (+1)
+                const flightRef = doc(db, "flights", flightId);
+                const flightSnap = await getDoc(flightRef);
+                if (flightSnap.exists()) {
+                    const currentSeats = flightSnap.data().seats;
+                    await updateDoc(flightRef, { seats: currentSeats + 1 });
+                }
+
+                // 2. Изтриваме поръчката
+                await deleteDoc(doc(db, "orders", orderId));
+                
+                await UI.success('Готово!', 'Билетът е върнат успешно.');
+                location.reload(); 
+            } catch (e) { 
+                console.error(e); 
+                UI.error('Грешка!', 'Възникна проблем при връщането.');
             }
-            await deleteDoc(doc(db, "orders", orderId));
-            alert("Билетът е върнат успешно.");
-            location.reload(); 
-        } catch (e) { console.error(e); alert("Грешка."); }
+        }
     };
+
+    document.getElementById('btn-logout').onclick = () => signOut(auth).then(() => location.reload());
 </script>
 
 </body>
