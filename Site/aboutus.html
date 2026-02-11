@@ -30,71 +30,81 @@
             100% { background-position: 0% 50%; }
         }
 
-        /* НАВИГАЦИЯ */
+        /* --- НОВАТА РАЗДЕЛЕНА НАВИГАЦИЯ --- */
         nav { 
             background: rgba(15, 12, 41, 0.6);
             backdrop-filter: blur(12px);
-            height: 80px; padding: 0 8%;
+            height: 80px; padding: 0 5%;
             display: flex; justify-content: space-between; align-items: center; 
             border-bottom: 1px solid var(--border);
             position: sticky; top: 0; z-index: 100;
         }
-        .logo { font-size: 26px; font-weight: 700; color: white; text-decoration: none; text-shadow: 0 0 15px rgba(255,255,255,0.2); }
-        .nav-links a { text-decoration: none; color: var(--text-dim); margin-left: 25px; transition: 0.3s; font-weight: 500; }
-        .nav-links a:hover { color: white; }
 
-        /* ОСНОВЕН КОНТЕЙНЕР */
+        /* ЛЯВА ЧАСТ */
+        .nav-left { display: flex; align-items: center; gap: 40px; }
+        .logo { font-size: 26px; font-weight: 700; color: white; text-decoration: none; }
+        .main-menu { display: flex; gap: 25px; }
+        .main-menu a { text-decoration: none; color: var(--text-dim); transition: 0.3s; font-weight: 500; font-size: 15px; }
+        .main-menu a:hover { color: white; }
+
+        /* ДЯСНА ЧАСТ */
+        .nav-right { display: flex; align-items: center; gap: 20px; }
+        #user-display { font-size: 14px; }
+        
+        /* Бутон Изход */
+        #btn-logout {
+            background: rgba(255, 71, 87, 0.2); color: #ff4757; 
+            border: 1px solid #ff4757; padding: 6px 18px; 
+            border-radius: 20px; cursor: pointer; font-family: inherit; font-size: 13px;
+        }
+        #btn-logout:hover { background: #ff4757; color: white; }
+
+        /* --- СЪДЪРЖАНИЕ --- */
         .container { max-width: 1000px; margin: 60px auto; padding: 0 20px; }
 
         h1 { font-size: 42px; text-align: center; margin-bottom: 40px; text-shadow: 0 0 20px rgba(165, 180, 252, 0.5); }
         h2 { font-size: 28px; margin-bottom: 20px; color: #a5b4fc; }
         p { line-height: 1.6; color: var(--text-dim); font-size: 18px; margin-bottom: 20px; }
 
-        /* СТЪКЛЕНИ КАРТИ */
         .glass-card {
             background: var(--glass);
             backdrop-filter: blur(16px);
             border: 1px solid var(--border);
-            border-radius: 24px;
-            padding: 40px;
-            margin-bottom: 40px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-            transition: 0.3s;
+            border-radius: 24px; padding: 40px; margin-bottom: 40px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3); transition: 0.3s;
         }
         .glass-card:hover { transform: translateY(-5px); background: var(--glass-hover); }
 
-        /* GRID ЗА "ЗАЩО НИЕ" */
-        .features-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-            margin-top: 20px;
-        }
-
-        .feature-item {
-            background: rgba(0,0,0,0.2);
-            padding: 25px; border-radius: 16px;
-            text-align: center; border: 1px solid rgba(255,255,255,0.05);
-        }
+        .features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-top: 20px; }
+        .feature-item { background: rgba(0,0,0,0.2); padding: 25px; border-radius: 16px; text-align: center; border: 1px solid rgba(255,255,255,0.05); }
         .feature-icon { font-size: 40px; margin-bottom: 15px; display: block; }
         .feature-title { font-weight: 700; font-size: 20px; margin-bottom: 10px; color: white; }
         .feature-desc { font-size: 14px; color: var(--text-dim); }
 
-        footer {
-            text-align: center; color: var(--text-dim); padding: 40px 0; font-size: 14px;
-            border-top: 1px solid var(--border); margin-top: 60px;
+        footer { text-align: center; color: var(--text-dim); padding: 40px 0; font-size: 14px; border-top: 1px solid var(--border); margin-top: 60px; }
+        
+        @media (max-width: 900px) {
+            .nav-left { gap: 20px; }
+            .main-menu { gap: 15px; font-size: 14px; }
         }
     </style>
 </head>
 <body>
 
 <nav>
-    <a href="index.html" class="logo">SkyTickets</a>
-    <div class="nav-links">
-        <a href="index.html">Търсене</a>
-        <a href="my-tickets.html">Моите билети</a>
-        <a href="contacts.html">Контакти</a>
-        <span id="user-display" style="font-size: 14px; font-weight: 500; color: #a5b4fc; margin-left:15px;"></span>
+    <div class="nav-left">
+        <a href="index.html" class="logo">SkyTickets</a>
+        <div class="main-menu">
+            <a href="index.html">Търсене</a>
+            <a href="my-tickets.html">Моите билети</a>
+            <a href="aboutus.html" style="color:white; font-weight:700;">За нас</a> <a href="contacts.html">Контакти</a>
+        </div>
+    </div>
+
+    <div class="nav-right">
+        <a href="admin.html" id="admin-btn" style="display: none; color: #a5b4fc; text-decoration: none; font-weight: 500;">Админ</a>
+        <span id="user-display"></span>
+        <button id="btn-logout" style="display: none;">Изход</button>
     </div>
 </nav>
 
@@ -108,45 +118,28 @@
             Създадохме тази система с една цел – да премахнем стреса от планирането на полети и да го заменим с 
             елегантност, бързина и сигурност.
         </p>
-        <p>
-            Вярваме, че всеки полет е началото на ново приключение. Независимо дали пътувате по работа или за удоволствие, 
-            нашият интерфейс ви позволява да намерите най-добрите оферти за секунди.
-        </p>
     </div>
 
     <div class="glass-card">
         <h2 style="text-align: center;">Защо да изберете нас?</h2>
-        
         <div class="features-grid">
             <div class="feature-item">
-                <span class="feature-icon"></span>
+                <span class="feature-icon">🚀</span>
                 <div class="feature-title">Бързина</div>
-                <div class="feature-desc">Резервация на билет отнема по-малко от 2 минути. Без излишни стъпки.</div>
+                <div class="feature-desc">Резервация на билет отнема по-малко от 2 минути.</div>
             </div>
             <div class="feature-item">
-                <span class="feature-icon"></span>
+                <span class="feature-icon">🔒</span>
                 <div class="feature-title">Сигурност</div>
-                <div class="feature-desc">Вашите данни са защитени с най-модерните технологии за криптиране.</div>
+                <div class="feature-desc">Вашите данни са защитени с най-модерните технологии.</div>
             </div>
             <div class="feature-item">
-                <span class="feature-icon"></span>
+                <span class="feature-icon">🌍</span>
                 <div class="feature-title">Глобалност</div>
-                <div class="feature-desc">Покриваме дестинации в цяла Европа и света. Светът е на един клик разстояние.</div>
+                <div class="feature-desc">Покриваме дестинации в цяла Европа и света.</div>
             </div>
         </div>
     </div>
-
-    <div class="glass-card">
-        <h2>Нашата история</h2>
-        <p>
-            Стартирахме през 2025 година като малък стартъп с голяма мечта. Днес SkyTickets обслужва хиляди потребители, 
-            предоставяйки им най-лесния начин да стигнат от точка А до точка Б.
-        </p>
-        <p>
-            Ние сме екип от мечтатели, програмисти и пътешественици, обединени от страстта към авиацията.
-        </p>
-    </div>
-
 </div>
 
 <footer>
@@ -154,36 +147,32 @@
 </footer>
 
 <script type="module">
-    import { auth } from './firebase-config.js';
-    import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-auth.js";
+    import { auth, db } from './firebase-config.js';
+    import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-auth.js";
+    import { doc, getDoc } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-firestore.js";
 
-   onAuthStateChanged(auth, async (user) => {
+    onAuthStateChanged(auth, async (user) => {
         const d = document.getElementById('user-display');
         const out = document.getElementById('btn-logout');
         const adm = document.getElementById('admin-btn');
 
         if (user) {
-            // ТОВА Е ПРОМЯНАТА: Правим го на ЛИНК (innerHTML) вместо само текст
             d.innerHTML = `<a href="profile.html" style="color:#a5b4fc; text-decoration:none; font-weight:bold;">👤 ${user.email.split('@')[0]}</a>`;
+            out.style.display = "block";
             
-            out.style.display = "inline-block";
-            
-            // Проверка за админ права
             try { 
                 const u = await getDoc(doc(db, "users", user.uid)); 
                 if (u.exists() && u.data().role === "admin") adm.style.display = "inline-block"; 
             } catch(e) {}
 
         } else {
-            // Ако не е влязъл - показваме бутон "Вход"
             d.innerHTML = '<a href="login.html" style="color:#a5b4fc; text-decoration:none;">Вход</a>';
             out.style.display = "none";
             adm.style.display = "none";
         }
-
-        initApp(); 
-        setTimeout(displayFlights, 1000);
     });
+
+    document.getElementById('btn-logout').onclick = () => signOut(auth).then(() => location.reload());
 </script>
 
 </body>

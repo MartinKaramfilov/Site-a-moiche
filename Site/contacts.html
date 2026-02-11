@@ -45,31 +45,32 @@
             box-shadow: 0 0 15px rgba(102, 126, 234, 0.4);
         }
 
-        /* НАВИГАЦИЯ */
+        /* --- НОВАТА РАЗДЕЛЕНА НАВИГАЦИЯ --- */
         nav { 
             background: rgba(15, 12, 41, 0.6);
-            backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
-            height: 80px; padding: 0 8%;
+            backdrop-filter: blur(12px);
+            height: 80px; padding: 0 5%;
             display: flex; justify-content: space-between; align-items: center; 
             border-bottom: 1px solid var(--border);
+            position: sticky; top: 0; z-index: 100;
         }
-        .logo { 
-            font-size: 26px; font-weight: 700; color: white; text-decoration: none; 
-            text-shadow: 0 0 20px rgba(255,255,255,0.3);
-        }
-        
-        .nav-links { display: flex; align-items: center; gap: 20px; }
-        .nav-links a { text-decoration: none; color: var(--text-dim); transition: 0.3s; font-weight: 500; }
-        .nav-links a:hover { color: white; }
 
-        /* БУТОН ИЗХОД */
+        /* ЛЯВА ЧАСТ */
+        .nav-left { display: flex; align-items: center; gap: 40px; }
+        .logo { font-size: 26px; font-weight: 700; color: white; text-decoration: none; }
+        .main-menu { display: flex; gap: 25px; }
+        .main-menu a { text-decoration: none; color: var(--text-dim); transition: 0.3s; font-weight: 500; font-size: 15px; }
+        .main-menu a:hover { color: white; }
+
+        /* ДЯСНА ЧАСТ */
+        .nav-right { display: flex; align-items: center; gap: 20px; }
+        #user-display { font-size: 14px; }
         #btn-logout {
-            width: auto !important; margin: 0; padding: 8px 20px; font-size: 14px;
             background: rgba(255, 71, 87, 0.2); color: #ff4757; 
-            border: 1px solid #ff4757; border-radius: 20px;
-            box-shadow: none;
+            border: 1px solid #ff4757; padding: 6px 18px; 
+            border-radius: 20px; cursor: pointer; font-family: inherit; font-size: 13px;
         }
-        #btn-logout:hover { background: #ff4757; color: white; transform: translateY(-2px); }
+        #btn-logout:hover { background: #ff4757; color: white; }
 
         /* КОНТЕЙНЕР */
         .container { 
@@ -116,20 +117,28 @@
         }
         .send-btn:hover { transform: translateY(-2px); filter: brightness(1.2); }
 
-        @media (max-width: 768px) { .container { grid-template-columns: 1fr; } }
+        @media (max-width: 900px) {
+            .container { grid-template-columns: 1fr; }
+            .nav-left { gap: 20px; } .main-menu { gap: 15px; font-size: 14px; }
+        }
     </style>
 </head>
 <body>
 
 <nav>
-    <a href="index.html" class="logo">SkyTickets</a>
-    <div class="nav-links">
-        <a href="index.html">Търсене</a>
-        <a href="my-tickets.html">Моите билети</a>
-        <a href="aboutus.html">За нас</a>
+    <div class="nav-left">
+        <a href="index.html" class="logo">SkyTickets</a>
+        <div class="main-menu">
+            <a href="index.html">Търсене</a>
+            <a href="my-tickets.html">Моите билети</a>
+            <a href="aboutus.html">За нас</a>
+            <a href="contacts.html" style="color:white; font-weight:700;">Контакти</a>
+        </div>
+    </div>
 
-        <a href="admin.html" id="admin-btn" style="display: none;">Админ</a>
-        <span id="user-display" style="font-size: 14px;"></span>
+    <div class="nav-right">
+        <a href="admin.html" id="admin-btn" style="display: none; color: #a5b4fc; text-decoration: none; font-weight: 500;">Админ</a>
+        <span id="user-display"></span>
         <button id="btn-logout" style="display: none;">Изход</button>
     </div>
 </nav>
@@ -159,21 +168,18 @@
     import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-auth.js";
     import { collection, addDoc, doc, getDoc } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-firestore.js";
 
-    // --- 1. НАШИЯТ UI HELPER (За красиви съобщения) ---
     const UI = {
         success: (title, msg) => Swal.fire({ title: title, text: msg, icon: 'success', confirmButtonText: 'Супер' }),
         error: (title, msg) => Swal.fire({ title: title, text: msg, icon: 'error', confirmButtonText: 'Ок' }),
         warning: (title, msg) => Swal.fire({ title: title, text: msg, icon: 'warning', confirmButtonText: 'Разбрах' })
     };
 
-    // --- 2. ФУНКЦИЯ ЗА ИЗПРАЩАНЕ ---
     window.sendMessage = async () => {
         const name = document.getElementById('msg-name').value;
         const email = document.getElementById('msg-email').value;
         const text = document.getElementById('msg-text').value;
 
         if (name.trim() === "" || email.trim() === "" || text.trim() === "") {
-            // Вместо alert използваме UI.warning
             UI.warning("Внимание", "Моля, попълнете всички полета!");
             return;
         }
@@ -183,9 +189,7 @@
                 name: name, email: email, message: text, timestamp: new Date().toLocaleString()
             });
 
-            // Вместо alert използваме UI.success
             UI.success("Готово!", "Благодарим ви! Съобщението е изпратено успешно.");
-            
             document.getElementById('msg-name').value = "";
             document.getElementById('msg-email').value = "";
             document.getElementById('msg-text').value = "";
@@ -196,7 +200,6 @@
         }
     };
 
-    // --- 3. НАВИГАЦИЯ И ПРОФИЛ ---
     onAuthStateChanged(auth, async (user) => {
         const d = document.getElementById('user-display');
         const out = document.getElementById('btn-logout');
@@ -208,7 +211,7 @@
             
             try { 
                 const u = await getDoc(doc(db, "users", user.uid)); 
-                if (u.exists() && u.data().role === "admin") adm.style.display = "block"; 
+                if (u.exists() && u.data().role === "admin") adm.style.display = "inline-block"; 
             } catch(e) {}
 
         } else {

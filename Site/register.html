@@ -213,7 +213,14 @@
         }
     });
 
-    // 3. РЕГИСТРАЦИЯ (СЪБИРАНЕ НА ВСИЧКИ ДАННИ)
+    // 3.БЛОКИРА БУКВИТЕ
+    const phoneInput = document.getElementById('phone');
+    phoneInput.addEventListener('input', function() {
+        // Тази команда маха всичко, което НЕ е цифра (0-9) или плюс (+)
+        this.value = this.value.replace(/[^0-9+]/g, '');
+    });
+
+    // 4. РЕГИСТРАЦИЯ (СЪБИРАНЕ НА ВСИЧКИ ДАННИ)
     window.handleRegister = async () => {
         // Взимаме данните от новите полета
         const firstName = document.getElementById('firstName').value.trim();
