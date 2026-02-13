@@ -12,8 +12,6 @@
     
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-
     <style>
         :root {
             --glass-panel: rgba(0, 0, 0, 0.4);
@@ -52,7 +50,14 @@
         .swal2-title { font-family: 'Outfit', sans-serif !important; }
         .swal2-html-container { color: #cbd5e1 !important; }
 
-        /* --- НОВАТА РАЗДЕЛЕНА НАВИГАЦИЯ --- */
+        .pay-input {
+            width: 100%; padding: 12px; margin-bottom: 10px;
+            background: rgba(0,0,0,0.3); border: 1px solid var(--border);
+            border-radius: 10px; color: white; font-family: inherit; font-size: 15px; box-sizing: border-box; outline: none; text-align: left;
+        }
+        .pay-input:focus { border-color: #a5b4fc; }
+
+        /* --- РАЗДЕЛЕНА НАВИГАЦИЯ --- */
         nav { 
             background: rgba(15, 12, 41, 0.6);
             backdrop-filter: blur(12px);
@@ -62,14 +67,12 @@
             position: sticky; top: 0; z-index: 100;
         }
 
-        /* ЛЯВА ЧАСТ */
         .nav-left { display: flex; align-items: center; gap: 40px; }
         .logo { font-size: 26px; font-weight: 700; color: white; text-decoration: none; }
         .main-menu { display: flex; gap: 25px; }
         .main-menu a { text-decoration: none; color: var(--text-muted); transition: 0.3s; font-weight: 500; font-size: 15px; }
         .main-menu a:hover { color: white; }
 
-        /* ДЯСНА ЧАСТ */
         .nav-right { display: flex; align-items: center; gap: 20px; }
         #user-display { font-size: 14px; }
         #btn-logout {
@@ -103,7 +106,7 @@
 
         .search-btn { background: var(--accent); color: white; border: none; padding: 0 35px; height: 66px; border-radius: 16px; font-weight: 700; cursor: pointer; box-shadow: var(--glow); }
 
-        /* --- СПИСЪК С ПОЛЕТИ (ОРИГИНАЛЕН ДИЗАЙН БЕЗ СНИМКИ) --- */
+        /* --- СПИСЪК С ПОЛЕТИ --- */
         #flights-list { margin-top: 50px; }
         .flight-card { 
             background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(10px); 
@@ -133,6 +136,7 @@
         .tariff-price { font-size: 24px; font-weight: 700; color: white; display: block; }
         .select-btn { width: 100%; border: none; padding: 15px; margin-top: 15px; font-weight: 700; font-size: 16px; cursor: pointer; border-radius: 8px; transition: 0.3s; }
         .t-smart .select-btn { background: var(--smart); color: white; } .t-go .select-btn { background: var(--go); color: white; border: 1px solid rgba(255,255,255,0.2); } .t-plus .select-btn { background: var(--plus); color: white; }
+        
         .flatpickr-calendar { background: rgba(15, 12, 41, 0.95) !important; backdrop-filter: blur(15px); border: 1px solid rgba(255,255,255,0.2); font-family: 'Outfit', sans-serif; }
         .flatpickr-day.selected { background: #667eea !important; border-color: transparent; }
         @keyframes fadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
@@ -227,8 +231,7 @@
         success: (title, msg) => Swal.fire({ title: title, text: msg, icon: 'success', confirmButtonText: 'Супер' }),
         error: (title, msg) => Swal.fire({ title: title, text: msg, icon: 'error', confirmButtonText: 'Ок' }),
         warning: (title, msg) => Swal.fire({ title: title, text: msg, icon: 'warning', confirmButtonText: 'Разбрах' }),
-        loading: () => Swal.fire({ title: 'Обработване...', text: 'Моля изчакайте', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); } }),
-        confirm: (title, html) => Swal.fire({ title: title, html: html, icon: 'question', showCancelButton: true, confirmButtonText: 'Плащане', cancelButtonText: 'Отказ' })
+        loading: () => Swal.fire({ title: 'Обработване на плащането...', text: 'Моля изчакайте, не затваряйте прозореца.', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); } })
     };
 
     let allFlightsData = []; let departureCalendar; let returnCalendar;      
@@ -311,36 +314,124 @@
 
     window.openBaggageModal = (flightId, basePrice) => {
         if (!auth.currentUser) { UI.warning('Внимание', 'Моля, влезте в профила си!'); return; }
-        selectedFlightId = flightId; selectedFlightBasePrice = basePrice;
-        document.getElementById('price-basic').innerText = `+ 0 €`; document.getElementById('price-smart').innerText = `+ 35 €`; document.getElementById('price-plus').innerText = `+ 85 €`;
+        selectedFlightId = flightId; 
+        selectedFlightBasePrice = basePrice;
+        document.getElementById('price-basic').innerText = `+ 0 €`; 
+        document.getElementById('price-smart').innerText = `+ 35 €`; 
+        document.getElementById('price-plus').innerText = `+ 85 €`;
         document.getElementById('baggage-modal').style.display = 'flex';
     };
-    window.closeBaggageModal = () => { document.getElementById('baggage-modal').style.display = 'none'; selectedFlightId = null; };
-
-    window.selectTariff = async (tariffName, extraPrice) => {
-        const finalPrice = selectedFlightBasePrice + extraPrice;
-        const result = await UI.confirm('Потвърдете покупката', `
-            <div style="text-align:left; background:rgba(255,255,255,0.05); padding:15px; border-radius:10px;">
-                <p>Тарифа: <strong>${tariffName}</strong></p><p>Крайна цена: <strong style="color:#2ed573; font-size:20px;">${finalPrice} €</strong></p>
-            </div>`);
-        if (result.isConfirmed) { await finalizePurchase(selectedFlightId, tariffName, finalPrice); closeBaggageModal(); }
+    
+    window.closeBaggageModal = () => { 
+        document.getElementById('baggage-modal').style.display = 'none'; 
+        // ВНИМАНИЕ: ВЕЧЕ НЕ ИЗТРИВАМЕ selectedFlightId тук!
     };
 
-    async function finalizePurchase(flightId, tariffName, totalPrice) {
+   // --- НОВАТА СИМУЛАЦИЯ НА ПЛАЩАНЕ ---
+    window.selectTariff = async (tariffName, extraPrice) => {
+        const finalPrice = selectedFlightBasePrice + extraPrice;
+        
+        // 1. ЗАПАЗВАМЕ ID-то на полета ПРЕДИ да затворим модала
+        const currentFlightId = selectedFlightId;
+        
+        // 2. Затваряме модала с багажа
+        closeBaggageModal();
+
+        // 3. Отваряме формата за плащане
+        const { value: formValues } = await Swal.fire({
+            title: 'Детайли за плащане',
+            html: `
+                <div style="text-align:left; background:rgba(255,255,255,0.05); padding:15px; border-radius:10px; margin-bottom:20px;">
+                    <p style="margin:0 0 5px 0; color:#cbd5e1; font-size:14px;">Тарифа: <strong style="color:white;">${tariffName}</strong></p>
+                    <p style="margin:0; color:#cbd5e1; font-size:14px;">Общо за плащане: <strong style="color:#2ed573; font-size:22px;">${finalPrice} €</strong></p>
+                </div>
+                
+                <input id="swal-cc-name" class="pay-input" placeholder="Имена на картодържател (напр. IVAN IVANOV)" oninput="this.value = this.value.replace(/[0-9]/g, '')">
+                
+                <input id="swal-cc-num" class="pay-input" placeholder="Номер на карта (16 цифри)" maxlength="16" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+                
+                <div style="display:flex; gap:10px;">
+                    <input id="swal-cc-exp" class="pay-input" placeholder="ММ/ГГ" maxlength="5" oninput="
+                        let v = this.value.replace(/[^0-9]/g, ''); 
+                        if (v.length > 2) { v = v.substring(0, 2) + '/' + v.substring(2, 4); } 
+                        this.value = v;
+                    ">
+                    <input id="swal-cc-cvc" class="pay-input" placeholder="CVC" maxlength="3" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+                </div>
+            `,
+            focusConfirm: false,
+            showCancelButton: true,
+            confirmButtonText: 'Плати ' + finalPrice + ' €',
+            cancelButtonText: 'Отказ',
+            preConfirm: () => {
+                const name = document.getElementById('swal-cc-name').value;
+                const num = document.getElementById('swal-cc-num').value;
+                const exp = document.getElementById('swal-cc-exp').value;
+                const cvc = document.getElementById('swal-cc-cvc').value;
+
+                // name.trim() проверява дали не е въведен само празен интервал
+                if (!name.trim() || num.length !== 16 || exp.length !== 5 || cvc.length !== 3) {
+                    Swal.showValidationMessage('Моля, попълнете всички полета коректно!');
+                    return false;
+                }
+                return true;
+            }
+        });
+
+        if (formValues) {
+            // Подаваме запазеното ID към функцията
+            await finalizePurchase(currentFlightId, tariffName, finalPrice);
+        }
+    };
+
+    // --- ФИНАЛИЗИРАНЕ И ЗАПИСВАНЕ В БАЗАТА ---
+    async function finalizePurchase(flightIdToBuy, tariffName, totalPrice) {
         UI.loading();
-        const user = auth.currentUser; const flightRef = doc(db, "flights", flightId);
+        
         try {
-            const flightSnap = await getDoc(flightRef); if (!flightSnap.exists()) return;
+            if (!flightIdToBuy) throw new Error("Системна грешка: Липсва ID на полета!");
+
+            const user = auth.currentUser; 
+            const flightRef = doc(db, "flights", flightIdToBuy); // Вече е вътре в try блока
+            
+            const flightSnap = await getDoc(flightRef); 
+            
+            if (!flightSnap.exists()) {
+                UI.error('Грешка', 'Този полет вече не съществува!');
+                return;
+            }
+            
             const f = flightSnap.data();
+            
             if (f.seats > 0) {
+                // Добавяне в поръчките
                 await addDoc(collection(db, "orders"), {
-                    userId: user.uid, userEmail: user.email, flightId: flightId, flightTo: f.to, flightFrom: f.from,
-                    date: f.date, type: f.type, price: totalPrice, tariff: tariffName, purchaseDate: new Date().toLocaleDateString()
+                    userId: user.uid, 
+                    userEmail: user.email, 
+                    flightId: flightIdToBuy, 
+                    flightTo: f.to, 
+                    flightFrom: f.from,
+                    date: f.date, 
+                    type: f.type || 'oneway', 
+                    price: totalPrice, 
+                    tariff: tariffName, 
+                    purchaseDate: new Date().toLocaleDateString()
                 });
+                
+                // Намаляване на местата
                 await updateDoc(flightRef, { seats: f.seats - 1 });
-                UI.success('Готово!', 'Успешна резервация!'); initApp(); setTimeout(displayFlights, 500);
-            } else { UI.error('Грешка', 'Местата свършиха!'); }
-        } catch (e) { console.error(e); }
+                
+                UI.success('Успешно плащане!', 'Билетът е закупен и добавен в профила ви.'); 
+                initApp(); 
+                setTimeout(displayFlights, 500);
+            } else { 
+                UI.error('Грешка', 'Местата за този полет се изчерпаха!'); 
+            }
+        } catch (error) { 
+            console.error(error);
+            // Ако има проблем, хващаме го и спираме "въртенето"
+            UI.error('Възникна проблем', error.message); 
+        }
     }
 
     document.getElementById('btn-search').onclick = displayFlights;
@@ -350,7 +441,7 @@
         const d = document.getElementById('user-display'); const out = document.getElementById('btn-logout'); const adm = document.getElementById('admin-btn');
         if (user) {
             d.innerHTML = `<a href="profile.html" style="color:#a5b4fc; text-decoration:none; font-weight:bold;">👤 ${user.email.split('@')[0]}</a>`;
-            out.style.display = "inline-block";
+            out.style.display = "block";
             try { const u = await getDoc(doc(db, "users", user.uid)); if (u.exists() && u.data().role === "admin") adm.style.display = "inline-block"; } catch(e) {}
         } else {
             d.innerHTML = '<a href="login.html" style="color:#a5b4fc; text-decoration:none;">Вход</a>'; out.style.display = "none"; adm.style.display = "none";
