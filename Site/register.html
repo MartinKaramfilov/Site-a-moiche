@@ -115,8 +115,9 @@
     <p id="error-msg"></p>
 
     <div class="form-row">
-        <input type="text" id="firstName" placeholder="Име">
-        <input type="text" id="lastName" placeholder="Фамилия">
+        <input type="text" id="reg-firstname" placeholder="Име" oninput="this.value = this.value.replace(/[0-9]/g, '')">
+
+<input type="text" id="reg-lastname" placeholder="Фамилия" oninput="this.value = this.value.replace(/[0-9]/g, '')">
     </div>
 
     <div class="form-row">
@@ -133,8 +134,9 @@
     </div>
 
     <div class="form-row">
-        <input type="text" id="postalCode" placeholder="Пощенски код">
-        <input type="tel" id="phone" placeholder="Телефон">
+
+    <input type="text" id="reg-zip" placeholder="Пощенски код" maxlength="4" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+    <input type="tel" id="phone" placeholder="Телефон">
     </div>
 
     <input type="email" id="email" placeholder="Имейл адрес" style="margin-bottom: 15px;">

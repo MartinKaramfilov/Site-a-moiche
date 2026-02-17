@@ -13,6 +13,9 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     
     <style>
+        * {
+            box-sizing: border-box;
+        }
         :root {
             --glass-panel: rgba(0, 0, 0, 0.4);
             --glass-input: rgba(255, 255, 255, 0.07);
@@ -140,7 +143,59 @@
         .flatpickr-calendar { background: rgba(15, 12, 41, 0.95) !important; backdrop-filter: blur(15px); border: 1px solid rgba(255,255,255,0.2); font-family: 'Outfit', sans-serif; }
         .flatpickr-day.selected { background: #667eea !important; border-color: transparent; }
         @keyframes fadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
-        @media (max-width: 900px) { .search-grid { grid-template-columns: 1fr; } .input-group-merged { flex-direction: column; } .single-input, .search-btn { width: 100%; } }
+        /* RESPONSIVE */
+       @media (max-width: 950px) {
+            /* 1. ОПРАВЯМЕ НАВИГАЦИЯТА (МЕНЮТО) */
+            nav { 
+                flex-direction: column; /* Подреждаме ги едно под друго */
+                height: auto; 
+                padding: 15px 20px; 
+                gap: 15px; 
+            }
+            .nav-left { 
+                flex-direction: column; 
+                gap: 15px; 
+                width: 100%; 
+            }
+            .main-menu { 
+                flex-wrap: wrap; /* Разрешаваме им да минат на нов ред, ако няма място */
+                justify-content: center; 
+                gap: 15px; 
+            }
+            .nav-right { 
+                width: 100%; 
+                justify-content: center; 
+                flex-wrap: wrap; 
+                gap: 10px;
+            }
+
+            /* 2. ОПРАВЯМЕ ФОРМАТА ЗА ТЪРСЕНЕ */
+            .search-grid { 
+                grid-template-columns: 1fr; 
+                gap: 15px; 
+            }
+            .input-group-merged { 
+                flex-direction: column; 
+                width: 100%;
+            }
+            .input-wrapper { 
+                border-right: none; 
+                border-bottom: 1px solid var(--border); 
+                width: 100%;
+            }
+            .input-wrapper:last-child { 
+                border-bottom: none; 
+            }
+            .single-input { 
+                width: 100%; 
+                height: auto; 
+                min-height: 66px; 
+            }
+            .search-btn { 
+                width: 100%; 
+                margin-top: 5px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -173,10 +228,16 @@
             <label class="radio-group"><input type="radio" name="trip" value="round" checked onchange="toggleReturnDate()"> Двупосочен</label>
             <label class="radio-group"><input type="radio" name="trip" value="oneway" onchange="toggleReturnDate()"> Еднопосочен</label>
         </div>
-        <div class="search-grid">
+       <div class="search-grid">
             <div class="input-group-merged">
-                <div class="input-wrapper"><label>Откъде</label><input type="text" id="search-from" placeholder="Напр. София"></div>
-                <div class="input-wrapper"><label>Накъде</label><input type="text" id="search-to" placeholder="Напр. Лондон"></div>
+                <div class="input-wrapper">
+                    <label>Откъде</label>
+                    <input type="text" id="search-from" placeholder="Напр. София" oninput="this.value = this.value.replace(/[^a-zA-Zа-яА-Я\s]/g, '')">
+                </div>
+                <div class="input-wrapper">
+                    <label>Накъде</label>
+                    <input type="text" id="search-to" placeholder="Напр. Лондон" oninput="this.value = this.value.replace(/[^a-zA-Zа-яА-Я\s]/g, '')">
+                </div>
             </div>
             <div class="single-input"><label>Отиване</label><input type="text" id="search-date" placeholder="Дата"></div>
             <div class="single-input" id="return-date-container"><label>Връщане</label><input type="text" id="search-return-date" placeholder="Дата"></div>
@@ -346,7 +407,7 @@
                     <p style="margin:0; color:#cbd5e1; font-size:14px;">Общо за плащане: <strong style="color:#2ed573; font-size:22px;">${finalPrice} €</strong></p>
                 </div>
                 
-                <input id="swal-cc-name" class="pay-input" placeholder="Имена на картодържател (напр. IVAN IVANOV)" oninput="this.value = this.value.replace(/[0-9]/g, '')">
+                <input id="swal-cc-name" class="pay-input" placeholder="Имена на картодържател (напр. IVAN IVANOV)" oninput="this.value = this.value.replace(/[^a-zA-Z\s]/g, '')">
                 
                 <input id="swal-cc-num" class="pay-input" placeholder="Номер на карта (16 цифри)" maxlength="16" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
                 

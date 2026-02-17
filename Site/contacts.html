@@ -156,7 +156,7 @@
     </div>
 
     <div class="contact-form">
-        <input type="text" id="msg-name" placeholder="Вашето име">
+<input type="text" id="msg-name" placeholder="Вашето име" oninput="this.value = this.value.replace(/[0-9]/g, '')">
         <input type="email" id="msg-email" placeholder="Вашият имейл">
         <textarea id="msg-text" rows="5" placeholder="Как можем да помогнем?"></textarea>
         <button class="send-btn" onclick="sendMessage()">Изпрати съобщение</button>
