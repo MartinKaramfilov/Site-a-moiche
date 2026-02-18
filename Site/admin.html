@@ -34,7 +34,7 @@
             100% { background-position: 0% 50%; }
         }
 
-        /* --- STYLES ЗА КРАСИВИТЕ АЛЕРТИ (SweetAlert) --- */
+        /*STYLES ЗА АЛЕРТИ*/
         div:where(.swal2-container) div:where(.swal2-popup) {
             background: rgba(25, 25, 40, 0.95) !important;
             backdrop-filter: blur(10px);
@@ -50,7 +50,7 @@
             background: rgba(255,255,255,0.1) !important; 
         }
 
-        /* --- НОВАТА РАЗДЕЛЕНА НАВИГАЦИЯ --- */
+        /*НОВАТА РАЗДЕЛЕНА НАВИГАЦИЯ*/
         nav { 
             background: rgba(15, 12, 41, 0.6);
             backdrop-filter: blur(12px);
@@ -86,7 +86,7 @@
         }
         #btn-logout:hover { background: #ff4757; color: white; }
 
-        /* --- АДМИН ПАНЕЛ СТИЛОВЕ --- */
+        /*АДМИН ПАНЕЛ СТИЛОВЕ*/
         .admin-container { 
             max-width: 1200px; 
             margin: 40px auto; 
@@ -253,6 +253,10 @@
                 <input type="number" id="f-seats" placeholder="100">
             </div>
         </div>
+        <div class="form-group" style="margin-top: 10px;">
+            <label>Снимка на града (URL Линк)</label>
+            <input type="text" id="f-img" placeholder="https://example.com/paris.jpg">
+        </div>
         
         <button class="submit-btn" onclick="addFlight()">Създай полет</button>
     </div>
@@ -271,6 +275,7 @@
 
     </div>
 </div>
+<footer><p style="text-align: center; color: var(--text-muted); margin-top: 50px;">&copy; 2026 SkyTickets.</p></footer>
 
 <script type="module">
     import { auth, db } from './firebase-config.js';
@@ -326,7 +331,7 @@
     };
 
     // --- ДОБАВЯНЕ НА ПОЛЕТ ---
-    window.addFlight = async () => {
+   window.addFlight = async () => {
         const type = document.getElementById('f-type').value;
         const from = document.getElementById('f-from').value.trim();
         const to = document.getElementById('f-to').value.trim();
@@ -336,9 +341,12 @@
         const arrTime = document.getElementById('f-arr-time').value;
         const price = Number(document.getElementById('f-price').value);
         const seats = Number(document.getElementById('f-seats').value);
+        
+        // ВЗИМАМЕ ЛИНКА КЪМ СНИМКАТА
+        const imgUrl = document.getElementById('f-img').value.trim();
 
         if (!from || !to || !date || !depTime || !arrTime || price <= 0 || seats <= 0) {
-            UI.warning("Внимание", "Моля, попълнете всички задължителни полета коректно!");
+            UI.warning("Внимание", "Моля, попълнете всички задължителни полета!");
             return;
         }
         if (type === 'round' && !returnDate) {
@@ -347,16 +355,26 @@
         }
 
         try {
-            await addDoc(collection(db, "flights"), { type, from, to, date, returnDate, depTime, arrTime, price, seats });
+            // ЗАПАЗВАМЕ И СНИМКАТА (img) В БАЗАТА
+            await addDoc(collection(db, "flights"), { 
+                type, from, to, date, returnDate, depTime, arrTime, price, seats, 
+                img: imgUrl // Тук се запазва линкът
+            });
+            
             UI.success("Готово!", "Полетът беше добавен успешно.");
             
+            // Изчистване на формата
             document.getElementById('f-from').value = ''; document.getElementById('f-to').value = '';
             document.getElementById('f-date').value = ''; document.getElementById('f-return-date').value = '';
             document.getElementById('f-dep-time').value = ''; document.getElementById('f-arr-time').value = '';
             document.getElementById('f-price').value = ''; document.getElementById('f-seats').value = '';
+            document.getElementById('f-img').value = ''; // Чистим и полето за снимка
             
             loadAdminFlights(); 
-        } catch (error) { UI.error("Грешка", "Възникна проблем."); }
+        } catch (error) { 
+            console.error(error);
+            UI.error("Грешка", "Възникна проблем."); 
+        }
     };
 
     // --- ЗАРЕЖДАНЕ НА ПОЛЕТИТЕ ---

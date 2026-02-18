@@ -32,7 +32,7 @@
             100% { background-position: 0% 50%; }
         }
 
-        /* --- STYLES ЗА КРАСИВИТЕ АЛЕРТИ (SweetAlert) --- */
+        /*STYLE ЗА АЛЕРТИ*/
         div:where(.swal2-container) div:where(.swal2-popup) {
             background: rgba(25, 25, 40, 0.95) !important;
             backdrop-filter: blur(10px);
@@ -91,7 +91,7 @@
         .info-box p { color: var(--text-dim); line-height: 1.6; font-size: 16px; }
         .info-item { margin-top: 25px; display: flex; align-items: center; gap: 15px; font-size: 18px; color: white; }
 
-        /* ФОРМА (GLASS STYLE) */
+        /* ФОРМА (GLASS STYLE)*/
         .contact-form { 
             background: var(--glass);
             backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
@@ -108,7 +108,7 @@
         }
         input:focus, textarea:focus { border-color: #a5b4fc; background: rgba(0,0,0,0.5); }
 
-        /* БУТОН ЗА ИЗПРАЩАНЕ */
+        /*БУТОН ЗА ИЗПРАЩАНЕ*/
         .send-btn { 
             background: var(--accent); color: white; border: none; 
             padding: 15px; border-radius: 12px; font-weight: 700; cursor: pointer; 
@@ -156,13 +156,13 @@
     </div>
 
     <div class="contact-form">
-<input type="text" id="msg-name" placeholder="Вашето име" oninput="this.value = this.value.replace(/[0-9]/g, '')">
+<input type="text" id="msg-name" placeholder="Вашето име" oninput="this.value = this.value.replace(/[^a-zA-Zа-яА-Я\s]/g, '')">
         <input type="email" id="msg-email" placeholder="Вашият имейл">
         <textarea id="msg-text" rows="5" placeholder="Как можем да помогнем?"></textarea>
         <button class="send-btn" onclick="sendMessage()">Изпрати съобщение</button>
     </div>
 </div>
-
+    
 <script type="module">
     import { auth, db } from './firebase-config.js';
     import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-auth.js";
