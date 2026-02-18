@@ -314,7 +314,7 @@
     import { collection, getDocs, doc, updateDoc, getDoc, addDoc } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-firestore.js";
 
     const UI = {
-        success: (title, msg) => Swal.fire({ title: title, text: msg, icon: 'success', confirmButtonText: 'Супер' }),
+        success: (title, msg) => Swal.fire({ title: title, text: msg, icon: 'success', confirmButtonText: 'Благодаря!' }),
         error: (title, msg) => Swal.fire({ title: title, text: msg, icon: 'error', confirmButtonText: 'Ок' }),
         warning: (title, msg) => Swal.fire({ title: title, text: msg, icon: 'warning', confirmButtonText: 'Разбрах' }),
         loading: () => Swal.fire({ title: 'Обработване на плащането...', text: 'Моля изчакайте, не затваряйте прозореца.', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); } })
