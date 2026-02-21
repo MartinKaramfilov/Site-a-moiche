@@ -133,9 +133,49 @@
             color: white;
         }
 
-        @media (max-width: 900px) {
-            .nav-left { gap: 20px; }
-            .main-menu { gap: 15px; font-size: 14px; }
+       @media (max-width: 950px) {
+            /* 1. ОПРАВЯМЕ МЕНЮТО (Вече го знаеш наизуст) */
+            nav { flex-direction: column !important; height: auto !important; padding: 15px !important; gap: 15px !important; }
+            .nav-left { flex-direction: column !important; gap: 15px !important; width: 100% !important; }
+            .main-menu { flex-wrap: wrap !important; justify-content: center !important; gap: 15px !important; font-size: 15px !important; }
+            .nav-right { width: 100% !important; justify-content: center !important; flex-wrap: wrap !important; gap: 10px !important; }
+
+            /* 2. ОСНОВНИЯТ КОНТЕЙНЕР НА ПРОФИЛА */
+            /* Хващам най-честите имена на класове */
+            .container, .profile-container, .wrapper {
+                width: 100% !important;
+                padding: 15px !important;
+                margin: 20px auto !important;
+                box-sizing: border-box !important;
+            }
+
+            /* 3. КУТИИТЕ В ПРОФИЛА (Данни, Смяна на парола и т.н.) */
+            .glass-panel, .profile-box, .profile-card, .profile-form {
+                display: flex !important;
+                flex-direction: column !important;
+                width: 100% !important;
+                max-width: 100% !important;
+                padding: 20px !important;
+                margin-bottom: 20px !important;
+                box-sizing: border-box !important;
+            }
+
+            /* 4. АКО ИМА СНИМКА И ИНФО ЕДНО ДО ДРУГО -> СЛАГАМЕ ГИ ЕДНО ПОД ДРУГО */
+            .profile-header, .user-info-row {
+                display: flex !important;
+                flex-direction: column !important;
+                align-items: center !important;
+                text-align: center !important;
+                gap: 15px !important;
+            }
+
+            /* 5. ИНПУТ ПОЛЕТАТА (да са удобни за натискане с пръст) */
+            .glass-panel input, .profile-form input, 
+            .glass-panel button, .profile-form button {
+                width: 100% !important;
+                box-sizing: border-box !important;
+                margin-bottom: 10px !important;
+            }
         }
     </style>
 </head>

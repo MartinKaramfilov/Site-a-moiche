@@ -116,11 +116,61 @@
         }
         .cancel-btn:hover { background: #ff4757; color: white; }
 
-        @media (max-width: 700px) {
-            .ticket-card { flex-direction: column; }
-            .ticket-info { border-right: none; border-bottom: 2px dashed rgba(255,255,255,0.2); }
-            .ticket-action { width: 100%; padding: 30px; box-sizing: border-box; }
-            .nav-left { gap: 20px; } .main-menu { gap: 15px; font-size: 14px; }
+        /* --- РЕСПОНСИВ ДИЗАЙН --- */
+        @media (max-width: 950px) {
+            /* 1. Оправяме навигацията да е вертикална */
+            nav {
+                flex-direction: column;
+                height: auto;
+                padding: 15px 20px;
+                gap: 15px;
+            }
+            .nav-left { flex-direction: column; gap: 15px; width: 100%; }
+            .main-menu { flex-wrap: wrap; justify-content: center; gap: 15px; font-size: 15px; }
+            .nav-right { width: 100%; justify-content: center; flex-wrap: wrap; gap: 10px; }
+
+            /* 2. Оправяме контейнера */
+            .container { padding: 10px; margin: 30px auto; }
+            
+            /* 3. Оправяме билетите */
+            .ticket-card {
+                flex-direction: column; /* Инфото горе, QR-ът долу */
+            }
+
+            .ticket-info {
+                border-right: none; /* Махаме вертикалната линия */
+                border-bottom: 2px dashed rgba(255, 255, 255, 0.2); /* Слагаме хоризонтална линия */
+                padding: 20px; /* Малко по-компактен падинг */
+            }
+
+            /* Скриваме дупките на телефона, защото пречат на изгледа, когато билетът стане вертикален */
+            .ticket-info::before, 
+            .ticket-info::after {
+                display: none;
+            }
+
+            .ticket-action {
+                width: 100%; /* Разпъваме долната част до края */
+                flex-direction: row; /* Нареждаме Цена, QR и Бутон на един ред, ако има място */
+                justify-content: space-around;
+                padding: 20px;
+                box-sizing: border-box;
+                border-radius: 0 0 24px 24px; /* Запазваме заоблянето на долните ъгли */
+            }
+
+            .price { font-size: 24px; margin-bottom: 0; }
+            .qr-box { margin-bottom: 0; margin: 0 10px; }
+            .cancel-btn { padding: 8px 15px; }
+        }
+
+        /* За много малки екрани (тесни телефони), подреждаме долната част вертикално */
+        @media (max-width: 450px) {
+            .ticket-action {
+                flex-direction: column;
+                gap: 15px;
+            }
+            .price { margin-bottom: 5px; }
+            .qr-box { margin-bottom: 10px; }
         }
     </style>
 </head>

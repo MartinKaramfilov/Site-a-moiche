@@ -82,10 +82,45 @@
         .feature-desc { font-size: 14px; color: var(--text-dim); }
 
         footer { text-align: center; color: var(--text-dim); padding: 40px 0; font-size: 14px; border-top: 1px solid var(--border); margin-top: 60px; }
-        
-        @media (max-width: 900px) {
-            .nav-left { gap: 20px; }
-            .main-menu { gap: 15px; font-size: 14px; }
+        @media (max-width: 950px) {
+            /* 1. ОПРАВЯМЕ МЕНЮТО */
+            nav { 
+                flex-direction: column !important; 
+                height: auto !important; 
+                padding: 15px !important; 
+                gap: 15px !important; 
+            }
+            .nav-left { flex-direction: column !important; gap: 15px !important; width: 100% !important; }
+            .main-menu { flex-wrap: wrap !important; justify-content: center !important; gap: 15px !important; font-size: 15px !important; }
+            .nav-right { width: 100% !important; justify-content: center !important; flex-wrap: wrap !important; gap: 10px !important; }
+
+            /* 2. ОСНОВНИЯТ КОНТЕЙНЕР */
+            .container, .about-container {
+                width: 100% !important;
+                padding: 15px !important;
+                margin: 20px auto !important;
+                box-sizing: border-box !important;
+            }
+
+            /* 3. КУТИИТЕ С ТЕКСТ ИЛИ СНИМКИ */
+            /* Ако имаш две колони (напр. текст вляво, снимка вдясно), това ги слага една под друга */
+            .glass-panel, .info-box, .about-content, .team-grid {
+                display: flex !important;
+                flex-direction: column !important;
+                width: 100% !important;
+                max-width: 100% !important;
+                padding: 20px !important;
+                box-sizing: border-box !important;
+                margin-bottom: 20px !important;
+            }
+
+            /* 4. ОПРАВЯМЕ СНИМКИТЕ (ДА НЕ ИЗЛИЗАТ ОТ ЕКРАНА) */
+            .container img, .glass-panel img {
+                max-width: 100% !important;
+                height: auto !important;
+                border-radius: 15px !important;
+                margin-bottom: 15px !important;
+            }
         }
     </style>
 </head>

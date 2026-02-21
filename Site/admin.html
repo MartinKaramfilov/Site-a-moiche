@@ -9,6 +9,9 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <style>
+        * {
+            box-sizing: border-box;
+        }
         :root {
             --glass: rgba(255, 255, 255, 0.1);
             --border: rgba(255, 255, 255, 0.2);
@@ -169,11 +172,40 @@
             flex-direction: column;
             gap: 30px;
         }
+@media (max-width: 950px) {
+            /* 1. ОПРАВЯМЕ МЕНЮТО */
+            nav { 
+                flex-direction: column; 
+                height: auto; 
+                padding: 15px 20px; 
+                gap: 15px; 
+            }
+            .nav-left { flex-direction: column; gap: 15px; width: 100%; }
+            .main-menu { flex-wrap: wrap; justify-content: center; gap: 15px; }
+            .nav-right { width: 100%; justify-content: center; flex-wrap: wrap; gap: 10px; }
 
-        @media (max-width: 900px) {
-            .admin-container { grid-template-columns: 1fr; }
-            .nav-left { gap: 20px; } 
-            .main-menu { gap: 15px; font-size: 14px; }
+            /* 2. ТУК Е МАГИЯТА ЗА АДМИН ПАНЕЛА */
+            .admin-container {
+                grid-template-columns: 1fr; /* Правим го на точно 1 колона! */
+                margin: 20px auto;
+                padding: 0 10px;
+            }
+
+            /* 3. Оправяме картите с полети да не излизат от екрана */
+            .flight-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+            .flight-actions {
+                width: 100%;
+                display: flex;
+                gap: 10px;
+            }
+            .edit-btn, .delete-btn {
+                flex: 1; /* Разпъва бутоните по равно */
+                text-align: center;
+            }
         }
     </style>
 </head>
@@ -274,6 +306,12 @@
         </div>
 
     </div>
+    <div class="glass-panel" style="margin-top: 30px; grid-column: 1 / -1;">
+        <h2>✉️ Съобщения от клиенти</h2>
+        <div id="messages-list">
+            <p style="text-align:center; opacity:0.7;">Зареждане на съобщения...</p>
+        </div>
+    </div>
 </div>
 <footer><p style="text-align: center; color: var(--text-muted); margin-top: 50px;">&copy; 2026 SkyTickets.</p></footer>
 
@@ -303,7 +341,7 @@
     onAuthStateChanged(auth, async (user) => {
         const d = document.getElementById('user-display');
         const out = document.getElementById('btn-logout');
-
+       
         if (user) {
             d.innerHTML = `<a href="profile.html" style="color:#a5b4fc; text-decoration:none; font-weight:bold;">👤 ${user.email.split('@')[0]}</a>`;
             out.style.display = "block";
@@ -315,6 +353,7 @@
                 } else {
                     loadAdminFlights(); 
                     loadAdminOrders();
+                    loadMessages();
                 }
             } catch(e) { window.location.href = "index.html"; }
         } else {
@@ -480,6 +519,97 @@
             }
         }
     };
+    // ФУНКЦИЯ ЗА ЗАРЕЖДАНЕ НА СЪОБЩЕНИЯТА
+    async function loadMessages() {
+        const msgsList = document.getElementById('messages-list');
+        
+        try {
+            const querySnapshot = await getDocs(collection(db, "messages"));
+            
+            if (querySnapshot.empty) {
+                msgsList.innerHTML = "<div style='text-align:center; padding:20px; color:#cbd5e1;'>Няма нови съобщения.</div>";
+                return;
+            }
+
+            msgsList.innerHTML = ""; // Изчистваме "Зареждане..."
+            
+            querySnapshot.forEach((docSnap) => {
+                const msg = docSnap.data();
+                const msgId = docSnap.id;
+                
+                // Проверяваме имената на полетата (ако си ги кръстил различно, смени ги)
+                const senderName = msg.name || 'Анонимен';
+                const senderEmail = msg.email || 'Няма имейл';
+                const messageText = msg.text || msg.message || 'Празно съобщение';
+
+                msgsList.innerHTML += `
+                    <div style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); padding: 15px; border-radius: 12px; margin-bottom: 15px; position: relative;">
+                        <div style="margin-bottom: 10px;">
+                            <strong style="color: white; font-size: 18px;">${senderName}</strong> 
+                            <span style="color: #a5b4fc; margin-left: 10px; font-size: 14px;">✉️ ${senderEmail}</span>
+                        </div>
+                        <div style="background: rgba(0,0,0,0.2); padding: 15px; border-radius: 8px; color: #cbd5e1; font-size: 15px; line-height: 1.5;">
+                            ${messageText}
+                        </div>
+                        <div style="text-align: right; margin-top: 10px;">
+                            <button onclick="deleteMessage('${msgId}')" style="background: rgba(255, 71, 87, 0.15); color: #ff4757; border: 1px solid #ff4757; padding: 6px 15px; border-radius: 15px; cursor: pointer; transition: 0.3s;">
+                                Изтрий
+                            </button>
+                        </div>
+                    </div>
+                `;
+            });
+        } catch (error) {
+            console.error("Грешка при зареждане на съобщенията:", error);
+            msgsList.innerHTML = "<div style='text-align:center; color:#ff4757;'>Възникна грешка при зареждането.</div>";
+        }
+    }
+
+   // ФУНКЦИЯ ЗА ИЗТРИВАНЕ НА СЪОБЩЕНИЕ (С КРАСИВИ АЛЪРТИ)
+    window.deleteMessage = async (id) => {
+        // 1. Питаме за потвърждение с красив прозорец
+        const result = await Swal.fire({
+            title: 'Сигурни ли сте?',
+            text: "Искате да изтриете това съобщение? Действието не може да бъде върнато.",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Да, изтрий!',
+            cancelButtonText: 'Отказ',
+            background: 'rgba(25, 25, 40, 0.95)',
+            color: 'white'
+        });
+
+        // 2. Ако админът е цъкнал "Да, изтрий!"
+        if (result.isConfirmed) {
+            try {
+                await deleteDoc(doc(db, "messages", id)); // Трием от базата
+                
+                // Показваме съобщение за успех
+                Swal.fire({
+                    title: 'Изтрито!',
+                    text: 'Съобщението беше премахнато успешно.',
+                    icon: 'success',
+                    background: 'rgba(25, 25, 40, 0.95)',
+                    color: 'white',
+                    confirmButtonText: 'Супер'
+                });
+
+                loadMessages(); // Презареждаме списъка автоматично
+            } catch (e) {
+                console.error("Грешка при изтриване:", e);
+                // Показваме съобщение за грешка
+                Swal.fire({
+                    title: 'Грешка!',
+                    text: 'Възникна проблем при изтриването.',
+                    icon: 'error',
+                    background: 'rgba(25, 25, 40, 0.95)',
+                    color: 'white',
+                    confirmButtonText: 'Ок'
+                });
+            }
+        }
+    };
+    
 </script>
 
 </body>
