@@ -369,8 +369,8 @@
         if (type === 'round') { returnDate.disabled = false; } else { returnDate.disabled = true; returnDate.value = ""; }
     };
 
-    // --- ДОБАВЯНЕ НА ПОЛЕТ ---
-   window.addFlight = async () => {
+  // --- ДОБАВЯНЕ НА ПОЛЕТ ---
+    window.addFlight = async () => {
         const type = document.getElementById('f-type').value;
         const from = document.getElementById('f-from').value.trim();
         const to = document.getElementById('f-to').value.trim();
@@ -383,7 +383,8 @@
         
         // ВЗИМАМЕ ЛИНКА КЪМ СНИМКАТА
         const imgUrl = document.getElementById('f-img').value.trim();
-
+        
+        // 1. ПРОВЕРКА ЗА ПРАЗНИ ПОЛЕТА
         if (!from || !to || !date || !depTime || !arrTime || price <= 0 || seats <= 0) {
             UI.warning("Внимание", "Моля, попълнете всички задължителни полета!");
             return;
@@ -392,6 +393,28 @@
             UI.warning("Внимание", "Въведете дата на връщане!");
             return;
         }
+
+        // --- НОВИ ПРОВЕРКИ ЗА ДАТИ ---
+        // 2. Проверка дали датата и часът не са в миналото
+        const selectedDateTime = new Date(`${date}T${depTime}`);
+        const currentDateTime = new Date();
+
+        if (selectedDateTime < currentDateTime) {
+            UI.warning("Невалидна дата!", "Не можете да добавите полет в миналото. Моля, изберете бъдеща дата и час.");
+            return; // 🛑 Спира функцията!
+        }
+
+        // 3. Проверка за двупосочен полет (Връщането да не е преди тръгването)
+        if (type === 'round' && returnDate) {
+            const dReturn = new Date(returnDate);
+            const dDepart = new Date(date);
+
+            if (dReturn < dDepart) {
+                UI.warning("Нелогични дати!", "Датата на връщане не може да е преди датата на заминаване.");
+                return; // 🛑 Спира функцията!
+            }
+        }
+        // --- КРАЙ НА НОВИТЕ ПРОВЕРКИ ---
 
         try {
             // ЗАПАЗВАМЕ И СНИМКАТА (img) В БАЗАТА
@@ -441,6 +464,39 @@
                 `;
             });
         } catch (e) { list.innerHTML = "Грешка при зареждане."; }
+    }
+    async function cleanUpPastFlights() {
+        try {
+            // Взимаме абсолютно всички полети от базата
+            const flightsSnap = await getDocs(collection(db, "flights"));
+            const now = new Date(); // Точното време в момента
+            let deletedCount = 0; // Брояч, за да знаем дали сме изтрили нещо
+
+            // ВНИМАНИЕ: Използваме for...of цикъл, защото вътре имаме await (изтриване)
+            for (const flightDoc of flightsSnap.docs) {
+                const fData = flightDoc.data();
+                
+                // Проверяваме дали полетът изобщо има дата и час
+                if (fData.date && fData.depTime) {
+                    const departureDate = new Date(`${fData.date}T${fData.depTime}`);
+                    
+                    // Ако датата на полета е ПРЕДИ сегашния момент (т.е. е минал)
+                    if (departureDate < now) {
+                        // Трием го от базата
+                        await deleteDoc(doc(db, "flights", flightDoc.id));
+                        deletedCount++;
+                    }
+                }
+            }
+
+            // Ако сме изтрили поне 1 полет, презареждаме списъка на екрана
+            if (deletedCount > 0) {
+                console.log(`🧹 Чистачът мина: Автоматично изтрити ${deletedCount} стари полета.`);
+                loadAdminFlights(); 
+            }
+        } catch (error) {
+            console.error("Грешка при почистване на минали полети:", error);
+        }
     }
 
     // --- ИЗТРИВАНЕ НА ПОЛЕТ ---
@@ -553,9 +609,15 @@
                             ${messageText}
                         </div>
                         <div style="text-align: right; margin-top: 10px;">
-                            <button onclick="deleteMessage('${msgId}')" style="background: rgba(255, 71, 87, 0.15); color: #ff4757; border: 1px solid #ff4757; padding: 6px 15px; border-radius: 15px; cursor: pointer; transition: 0.3s;">
+                            
+                            <button onclick="replyMessage('${senderEmail}')" style="background: rgba(102, 126, 234, 0.2); color: #a5b4fc; border: 1px solid #a5b4fc; padding: 6px 15px; border-radius: 15px; cursor: pointer; margin-right: 10px; transition: 0.3s; display: inline-block;">
+                                Отговори
+                            </button>
+
+                            <button onclick="deleteMessage('${msgId}')" style="background: rgba(255, 71, 87, 0.15); color: #ff4757; border: 1px solid #ff4757; padding: 6px 15px; border-radius: 15px; cursor: pointer; transition: 0.3s; display: inline-block;">
                                 Изтрий
                             </button>
+
                         </div>
                     </div>
                 `;
@@ -611,6 +673,36 @@
         }
     };
     
+    // ФУНКЦИЯ ЗА ОТГОВОР НА СЪОБЩЕНИЕ
+    window.replyMessage = (email) => {
+        // Проверяваме дали изобщо има имейл
+        if (!email || email === 'Няма имейл' || email === 'undefined') {
+            Swal.fire({
+                title: 'Грешка!', 
+                text: 'Този потребител не е оставил валиден имейл адрес.', 
+                icon: 'error',
+                background: 'rgba(25, 25, 40, 0.95)', color: 'white'
+            });
+            return;
+        }
+
+        // Показваме прозорец с избор
+        Swal.fire({
+            title: 'Отговор до клиент',
+            html: `Имейл адрес:<br><strong style="color:#a5b4fc; font-size:18px;">${email}</strong>`,
+            icon: 'info',
+            showCancelButton: true,
+            confirmButtonText: 'Отвори Gmail',
+            cancelButtonText: 'Затвори',
+            background: 'rgba(25, 25, 40, 0.95)',
+            color: 'white'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Отваря директно браузърния Gmail с попълнен получател и тема!
+                window.open(`https://mail.google.com/mail/?view=cm&fs=1&to=${email}&su=Отговор от SkyTickets`, '_blank');
+            }
+        });
+    };
 </script>
 
 </body>

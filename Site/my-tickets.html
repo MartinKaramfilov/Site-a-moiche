@@ -307,22 +307,54 @@
         } catch (error) { console.error("Грешка при зареждане:", error); container.innerHTML = "<p>Грешка при връзката с базата данни.</p>"; }
     }
 
-    window.cancelTicket = async (orderId, flightId) => {
-        const result = await UI.confirm('Сигурни ли сте?', "Искате да върнете този билет? Действието е окончателно!");
-        if (result.isConfirmed) {
-            try {
-                const flightRef = doc(db, "flights", flightId);
-                const flightSnap = await getDoc(flightRef);
+   window.cancelTicket = async (orderId, flightId) => {
+        try {
+            // 1. Първо взимаме данните за полета от базата, за да видим кога тръгва
+            const flightRef = doc(db, "flights", flightId);
+            const flightSnap = await getDoc(flightRef);
+            
+            let currentSeats = 0;
+
+            if (flightSnap.exists()) {
+                const fData = flightSnap.data();
+                currentSeats = fData.seats;
+                
+                // 2. ПРОВЕРКА ЗА 3-ТЕ ДНИ (72 часа)
+                if (fData.date && fData.depTime) {
+                    const departureDate = new Date(`${fData.date}T${fData.depTime}`);
+                    const now = new Date(); // Точното време сега
+                    
+                    // Смятаме разликата в часове
+                    const diffHours = (departureDate - now) / (1000 * 60 * 60);
+                    
+                    // Ако остават по-малко от 72 часа (или полетът вече е минал)
+                    if (diffHours < 72) {
+                        UI.error('Отказът е невъзможен', 'Не можете да върнете билет по-малко от 3 дни (72 часа) преди полета!');
+                        return; // 🛑 Спираме функцията, клиентът не може да откаже билета!
+                    }
+                }
+            }
+
+            // 3. Ако полетът е след повече от 3 дни, чак тогава го питаме
+            const result = await UI.confirm('Сигурни ли сте?', "Искате да върнете този билет? Действието е окончателно!");
+            
+            if (result.isConfirmed) {
+                // Връщаме мястото (ако полетът все още съществува)
                 if (flightSnap.exists()) {
-                    const currentSeats = flightSnap.data().seats;
                     await updateDoc(flightRef, { seats: currentSeats + 1 });
                 }
+                
+                // Изтриваме билета от неговия профил
                 await deleteDoc(doc(db, "orders", orderId));
-                await UI.success('Готово!', 'Билетът е върнат успешно.'); location.reload(); 
-            } catch (e) { console.error(e); UI.error('Грешка!', 'Възникна проблем при връщането.'); }
+                
+                await UI.success('Готово!', 'Билетът е върнат успешно.'); 
+                location.reload(); 
+            }
+        } catch (e) { 
+            console.error(e); 
+            UI.error('Грешка!', 'Възникна проблем при връщането.'); 
         }
     };
-
     document.getElementById('btn-logout').onclick = () => signOut(auth).then(() => location.reload());
 </script>
 
