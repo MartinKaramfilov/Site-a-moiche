@@ -402,7 +402,7 @@
         const currentDateTime = new Date();
 
         if (selectedDateTime < currentDateTime) {
-            UI.warning("Невалидна дата!", "Не можете да добавите полет в миналото. Моля, изберете бъдеща дата и час.");
+            UI.warning("Невалидна дата/час!", "Не можете да добавите полет в миналото. Моля, изберете бъдеща дата и час.");
             return; // 🛑 Спира функцията!
         }
 
@@ -487,7 +487,7 @@
 
                     // Проверяваме дали датата е валидна и дали е в миналото
                     if (!isNaN(departureDate) && departureDate < now) {
-                        console.log(` ИТРИВАНЕ НА ПОЛЕТ: ${fData.to} (Беше на ${fData.date})`);
+                        console.log(` ИЗТРИВАНЕ НА ПОЛЕТ: ${fData.to} (Беше на ${fData.date})`);
                         await deleteDoc(doc(db, "flights", flightDoc.id));
                         deletedCount++;
                     }
@@ -552,13 +552,32 @@
         } catch (e) { list.innerHTML = "Грешка при зареждане."; }
     }
 
-    // --- АНУЛИРАНЕ НА ПРОДАДЕН БИЛЕТ ---
+   // --- АНУЛИРАНЕ НА ПРОДАДЕН БИЛЕТ (С ОБОСНОВКА) ---
     window.cancelOrder = async (orderId, flightId) => {
-        const result = await UI.confirm("Анулиране?", "Този билет ще бъде изтрит и мястото ще се върне в полета!");
         
-        if (result.isConfirmed) {
+        // 1. Изкарваме прозорец, в който админът ЗАДЪЛЖИТЕЛНО пише причина
+        const { value: cancelReason } = await Swal.fire({
+            title: 'Анулиране на билет',
+            input: 'textarea',
+            inputLabel: 'Причина за анулиране (ще се покаже на клиента):',
+            inputPlaceholder: 'Напр. Полетът е отменен поради лошо време...',
+            showCancelButton: true,
+            confirmButtonText: 'Анулирай билета',
+            cancelButtonText: 'Отказ',
+            background: 'rgba(25, 25, 40, 0.95)',
+            color: 'white',
+            inputValidator: (value) => {
+                // Не му даваме да продължи, ако не е написал нищо
+                if (!value.trim()) {
+                    return 'Моля, напишете обосновка защо анулирате билета!';
+                }
+            }
+        });
+
+        // 2. Ако админът е написал причина и е цъкнал "Анулирай"
+        if (cancelReason) {
             try {
-                // 1. Опитваме да върнем мястото обратно в полета (+1)
+                // Връщаме 1 място обратно в полета (както си беше и досега)
                 const flightRef = doc(db, "flights", flightId);
                 const flightSnap = await getDoc(flightRef);
                 
@@ -567,12 +586,16 @@
                     await updateDoc(flightRef, { seats: currentSeats + 1 });
                 }
 
-                // 2. Изтриваме поръчката от базата
-                await deleteDoc(doc(db, "orders", orderId));
+                // 🛑 ВАЖНО: Вече НЕ трием поръчката с deleteDoc!
+                // Вместо това я обновяваме, слагаме статус 'cancelled' и добавяме причината.
+                await updateDoc(doc(db, "orders", orderId), {
+                    status: 'cancelled',
+                    cancelReason: cancelReason
+                });
 
-                UI.success("Готово!", "Билетът е анулиран успешно.");
+                UI.success("Готово!", "Билетът е анулиран и обосновката е запазена.");
                 
-                // Презареждаме и двата списъка, защото местата в полетите също са се променили
+                // Презареждаме и двата списъка
                 loadAdminOrders();
                 loadAdminFlights();
             } catch (error) {

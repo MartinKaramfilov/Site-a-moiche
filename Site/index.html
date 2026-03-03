@@ -462,8 +462,8 @@
         // ВНИМАНИЕ: ВЕЧЕ НЕ ИЗТРИВАМЕ selectedFlightId тук!
     };
 
-   // --- НОВАТА СИМУЛАЦИЯ НА ПЛАЩАНЕ ---
-   window.selectTariff = async (tariffName, extraPrice) => {
+  // --- НОВАТА СИМУЛАЦИЯ НА ПЛАЩАНЕ ---
+    window.selectTariff = async (tariffName, extraPrice) => {
         const finalPrice = selectedFlightBasePrice + extraPrice;
         
         // 1. ЗАПАЗВАМЕ ID-то на полета ПРЕДИ да затворим модала
@@ -504,12 +504,34 @@
                 const exp = document.getElementById('swal-cc-exp').value;
                 const cvc = document.getElementById('swal-cc-cvc').value;
 
-                // name.trim() проверява дали не е въведен само празен интервал
+                // 1. Проверка дали всичко е попълнено изобщо
                 if (!name.trim() || num.length !== 16 || exp.length !== 5 || cvc.length !== 3) {
                     Swal.showValidationMessage('Моля, попълнете всички полета коректно!');
                     return false;
                 }
-                return true;
+
+                // 2. ПРОВЕРКА ЗА ИЗТЕКЛА КАРТА ИЛИ ГРЕШЕН МЕСЕЦ
+                const [expMonth, expYearShort] = exp.split('/');
+                const expMonthNum = parseInt(expMonth, 10);
+                const expYearNum = parseInt(expYearShort, 10) + 2000; // "26" на "2026"
+
+                const currentDate = new Date();
+                const currentMonth = currentDate.getMonth() + 1; // Месеците почват от 0
+                const currentYear = currentDate.getFullYear();
+
+                // Проверяваме дали месецът е реален (от 01 до 12)
+                if (expMonthNum < 1 || expMonthNum > 12) {
+                    Swal.showValidationMessage('Тази карта не съществува.');
+                    return false;
+                }
+
+                // Проверяваме дали годината е минала ИЛИ сме в същата година, но месецът е минал
+                if (expYearNum < currentYear || (expYearNum === currentYear && expMonthNum < currentMonth)) {
+                    Swal.showValidationMessage('Тази карта е изтекла! Моля, използвайте валидна.');
+                    return false;
+                }
+
+                return true; // Ако мине всички проверки, продължаваме към плащането!
             }
         });
 
@@ -518,6 +540,7 @@
             await finalizePurchase(currentFlightId, tariffName, finalPrice);
         }
     };
+
     // --- ФИНАЛИЗИРАНЕ И ЗАПИСВАНЕ В БАЗАТА ---
     async function finalizePurchase(flightIdToBuy, tariffName, totalPrice) {
         UI.loading();
@@ -563,7 +586,7 @@
             }
         } catch (error) { 
             console.error(error);
-            // Ако има проблем, хващаме го и спираме "въртенето"
+            // Ако има проблем го спираме 
             UI.error('Възникна проблем', error.message); 
         }
     }

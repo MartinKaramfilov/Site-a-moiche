@@ -273,10 +273,39 @@
                 let typeBadge = order.type === 'round' ? '<span class="badge" style="background: #667eea; color:white;">ДВУПОСОЧЕН</span>' : '<span class="badge">ЕДНОПОСОЧЕН</span>';
                 let tariffBadge = order.tariff ? `<div style="font-size:12px; color:#2ed573; margin-top:5px;">Тарифа: ${order.tariff}</div>` : '';
                 
-                ticketsData.push(orderId);
+                // --- НОВАТА ЛОГИКА ЗА ОТМЕНЕНИ БИЛЕТИ ---
+                const isCancelled = order.status === 'cancelled';
+                const cardStyle = isCancelled ? 'border: 2px solid #ff4757; opacity: 0.85; filter: grayscale(0.2);' : '';
+                
+                let actionBox = '';
+                let reasonBox = '';
+
+                if (isCancelled) {
+                    // Ако е отменен, показваме причината и голям червен надпис
+                    reasonBox = `
+                        <div style="background: rgba(255, 71, 87, 0.1); border-left: 4px solid #ff4757; color: #ffb8b8; padding: 10px; margin-top: 15px; border-radius: 4px; font-size: 14px;">
+                            <strong>Отменен от администратор:</strong> ${order.cancelReason || 'Не е посочена причина.'}
+                        </div>
+                    `;
+                    actionBox = `
+                        <div style="text-align: right;">
+                            <span style="background: #ff4757; color: white; padding: 5px 10px; border-radius: 5px; font-weight: bold; font-size: 14px; display: inline-block; margin-bottom: 10px;">АНУЛИРАН</span>
+                            <div class="price" style="text-decoration: line-through; opacity: 0.5;">${order.price} €</div>
+                        </div>
+                    `;
+                } else {
+                    // Ако НЕ е отменен, добавяме го в масива за генериране на QR код и показваме бутоните
+                    ticketsData.push(orderId);
+                    actionBox = `
+                        <div class="price">${order.price} €</div>
+                        <div class="qr-box" id="qrcode-${orderId}"></div>
+                        <button class="cancel-btn" onclick="cancelTicket('${orderId}', '${order.flightId}')">Отказ</button>
+                    `;
+                }
+                // ----------------------------------------
 
                 container.innerHTML += `
-                    <div class="ticket-card">
+                    <div class="ticket-card" style="${cardStyle}">
                         <div class="ticket-info">
                             ${typeBadge}
                             <div class="route" style="margin-top:10px;">${order.flightFrom} ➔ ${order.flightTo}</div>
@@ -284,11 +313,10 @@
                             <div class="dates">📅 Дата: ${order.date} ${returnDateInfo}</div>
                             ${tariffBadge}
                             <div style="font-size:12px; opacity:0.5; margin-top:5px;">Ticket ID: #${orderId}</div>
+                            ${reasonBox}
                         </div>
                         <div class="ticket-action">
-                            <div class="price">${order.price} €</div>
-                            <div class="qr-box" id="qrcode-${orderId}"></div>
-                            <button class="cancel-btn" onclick="cancelTicket('${orderId}', '${order.flightId}')">Отказ</button>
+                            ${actionBox}
                         </div>
                     </div>
                 `;
