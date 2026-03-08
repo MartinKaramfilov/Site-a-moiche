@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Регистрация | SkyTickets</title>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
          * {
             box-sizing: border-box;
@@ -149,7 +150,7 @@
     <div class="form-row">
         <div style="position:relative;">
             <label style="font-size:10px; color:#cbd5e1; position:absolute; top:-18px; left:5px;">Дата на раждане</label>
-            <input type="date" id="birthDate" style="color-scheme: dark;">
+            <input type="date" id="birthDateValue" style="color-scheme: dark;">
         </div>
         <select id="gender">
             <option value="" disabled selected>Пол</option>
@@ -165,7 +166,7 @@
     <input type="tel" id="phone" placeholder="Телефон">
     </div>
 
-    <input type="email" id="email" placeholder="Имейл адрес" style="margin-bottom: 15px;">
+   <input type="email" id="email" placeholder="Имейл адрес" style="margin-bottom: 15px;" oninput="this.value = this.value.replace(/[^a-zA-Z0-9@._-]/g, '')">
     
     <div class="password-wrapper">
         <input type="password" id="password" placeholder="Парола">
@@ -248,27 +249,59 @@
         this.value = this.value.replace(/[^0-9+]/g, '');
     });
 
-    // 4. РЕГИСТРАЦИЯ (СЪБИРАНЕ НА ВСИЧКИ ДАННИ)
+   // 4. РЕГИСТРАЦИЯ (СЪБИРАНЕ НА ВСИЧКИ ДАННИ)
     window.handleRegister = async () => {
-        // Взимаме данните от новите полета
-        const firstName = document.getElementById('firstName').value.trim();
-        const lastName = document.getElementById('lastName').value.trim();
-        const birthDate = document.getElementById('birthDate').value;
+        errorMsg.style.display = 'none'; 
+
+        const firstName = document.getElementById('reg-firstname').value.trim();
+        const lastName = document.getElementById('reg-lastname').value.trim();
+        const birthDateValue = document.getElementById('birthDateValue').value;
         const gender = document.getElementById('gender').value;
-        const postalCode = document.getElementById('postalCode').value.trim();
+        const postalCode = document.getElementById('reg-zip').value.trim();
         const phone = document.getElementById('phone').value.trim();
         const email = document.getElementById('email').value.trim();
         const password = document.getElementById('password').value;
 
-        // Проверка дали всичко е попълнено
-        if(!firstName || !lastName || !birthDate || !gender || !postalCode || !phone || !email || !password) {
+        // 1. Проверка дали всичко е попълнено
+        if(!firstName || !lastName || !birthDateValue || !gender || !postalCode || !phone || !email || !password) {
             errorMsg.innerText = "Моля, попълнете всички полета!";
             errorMsg.style.display = 'block';
             return;
         }
 
+        // 2. СТРОГА ПРОВЕРКА ЗА ИМЕЙЛ (САМО ЛАТИНИЦА)
+        // Проверява за стриктен формат: само английски букви, цифри, точки и тирета
+        const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+        if (!emailRegex.test(email)) {
+            errorMsg.innerText = "Моля, въведете валиден имейл (само на латиница, без интервали)!";
+            errorMsg.style.display = 'block';
+            return;
+        }
+
+        // 3. ПРОВЕРКАТА ЗА ДАТАТА НА РАЖДАНЕ (18 ГОДИНИ)
+        if (birthDateValue) {
+            const dob = new Date(birthDateValue);
+            const today = new Date();
+            
+            // Смятаме коя дата е била точно преди 18 години от днес
+            const eighteenYearsAgo = new Date(today.getFullYear() - 18, today.getMonth(), today.getDate());
+
+            // Ако е написал дата в бъдещето
+            if (dob > today) {
+                errorMsg.innerText = "Пътуването във времето е забранено! Изберете реална дата.";
+                errorMsg.style.display = 'block';
+                return;
+            } 
+            // Ако датата му на раждане е ПО-ГОЛЯМА (т.е. по-скорошна) от датата преди 18 години
+            else if (dob > eighteenYearsAgo) {
+                errorMsg.innerText = "Трябва да имате навършени 18 години, за да се регистрирате!";
+                errorMsg.style.display = 'block';
+                return; 
+            }
+        }
+
         try {
-            // Създаваме потребител в Auth (Само имейл и парола)
+            // Създаваме потребител в Auth
             const userCredential = await createUserWithEmailAndPassword(auth, email, password);
             const user = userCredential.user;
 
@@ -277,21 +310,39 @@
                 email: user.email,
                 firstName: firstName,
                 lastName: lastName,
-                birthDate: birthDate,
+                birthDateValue: birthDateValue, 
                 gender: gender,
                 postalCode: postalCode,
                 phone: phone,
-                role: "user", // По подразбиране е потребител
+                role: "user",
                 createdAt: new Date()
             });
 
-            alert("Успешна регистрация!");
+         
+            
+            //АЛЪРТ 
+            await Swal.fire({
+                title: 'Добре дошли!',
+                text: 'Успешна регистрация в SkyTickets. Приятно пътуване!',
+                icon: 'success',
+                background: 'rgba(25, 25, 40, 0.95)',
+                color: 'white',
+                confirmButtonText: 'Към началната страница',
+                timer: 3000 // Автоматично се затваря след 3 секунди, ако не цъкне бутона
+            });
+
+            // Чак след като затвори алърта (или минат 3-те секунди), го пращаме към началната страница
             window.location.href = "index.html";
 
         } catch (error) {
             console.error(error);
-            if (error.code === 'auth/email-already-in-use') errorMsg.innerText = "Този имейл вече е регистриран.";
-            else errorMsg.innerText = "Грешка: " + error.message;
+            if (error.code === 'auth/email-already-in-use') {
+                errorMsg.innerText = "Този имейл вече е регистриран.";
+            } else if (error.code === 'auth/invalid-email') {
+                errorMsg.innerText = "Невалиден формат на имейла.";
+            } else {
+                errorMsg.innerText = "Грешка: " + error.message;
+            }
             errorMsg.style.display = 'block';
         }
     };
