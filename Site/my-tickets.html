@@ -273,7 +273,10 @@
                 let typeBadge = order.type === 'round' ? '<span class="badge" style="background: #667eea; color:white;">ДВУПОСОЧЕН</span>' : '<span class="badge">ЕДНОПОСОЧЕН</span>';
                 let tariffBadge = order.tariff ? `<div style="font-size:12px; color:#2ed573; margin-top:5px;">Тарифа: ${order.tariff}</div>` : '';
                 
-                // --- НОВАТА ЛОГИКА ЗА ОТМЕНЕНИ БИЛЕТИ ---
+                // --- НОВО: ПОКАЗВАМЕ ИЗБРАНОТО МЯСТО (ако има такова) ---
+                let seatBadge = order.seat ? `<div style="font-size:14px; color:#ffd32a; margin-top:5px; background: rgba(255, 211, 42, 0.1); display: inline-block; padding: 4px 10px; border-radius: 6px; border: 1px solid rgba(255, 211, 42, 0.3);">💺 Място: <strong>${order.seat}</strong></div>` : '';
+                
+                // Проверка за отменени билети
                 const isCancelled = order.status === 'cancelled';
                 const cardStyle = isCancelled ? 'border: 2px solid #ff4757; opacity: 0.85; filter: grayscale(0.2);' : '';
                 
@@ -281,7 +284,6 @@
                 let reasonBox = '';
 
                 if (isCancelled) {
-                    // Ако е отменен, показваме причината и голям червен надпис
                     reasonBox = `
                         <div style="background: rgba(255, 71, 87, 0.1); border-left: 4px solid #ff4757; color: #ffb8b8; padding: 10px; margin-top: 15px; border-radius: 4px; font-size: 14px;">
                             <strong>Отменен от администратор:</strong> ${order.cancelReason || 'Не е посочена причина.'}
@@ -294,7 +296,6 @@
                         </div>
                     `;
                 } else {
-                    // Ако НЕ е отменен, добавяме го в масива за генериране на QR код и показваме бутоните
                     ticketsData.push(orderId);
                     actionBox = `
                         <div class="price">${order.price} €</div>
@@ -302,7 +303,6 @@
                         <button class="cancel-btn" onclick="cancelTicket('${orderId}', '${order.flightId}')">Отказ</button>
                     `;
                 }
-                // ----------------------------------------
 
                 container.innerHTML += `
                     <div class="ticket-card" style="${cardStyle}">
@@ -312,7 +312,8 @@
                             <div class="flight-time">${depTime} <span style="font-size:16px; opacity:0.6">➜</span> ${arrTime}</div>
                             <div class="dates">📅 Дата: ${order.date} ${returnDateInfo}</div>
                             ${tariffBadge}
-                            <div style="font-size:12px; opacity:0.5; margin-top:5px;">Ticket ID: #${orderId}</div>
+                            <br>
+                            ${seatBadge} <div style="font-size:12px; opacity:0.5; margin-top:10px;">Ticket ID: #${orderId}</div>
                             ${reasonBox}
                         </div>
                         <div class="ticket-action">

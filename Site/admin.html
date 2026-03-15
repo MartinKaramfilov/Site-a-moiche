@@ -516,7 +516,7 @@
         }
     };
 
-    // --- ЗАРЕЖДАНЕ НА ПРОДАДЕНИТЕ БИЛЕТИ ---
+   // --- ЗАРЕЖДАНЕ НА ПРОДАДЕНИТЕ БИЛЕТИ ---
     async function loadAdminOrders() {
         const list = document.getElementById('admin-orders-list');
         list.innerHTML = "Зареждане...";
@@ -534,24 +534,33 @@
                 const order = doc.data();
                 const orderId = doc.id;
                 
+                // Проверяваме дали има място (за старите билети ще показва просто празно пространство)
+                const seatInfo = order.seat ? `💺 Място: ${order.seat} &nbsp;|&nbsp;` : '';
+
+                // Проверяваме дали билетът е анулиран
+                const isCancelled = order.status === 'cancelled';
+                const statusStyle = isCancelled ? 'opacity: 0.6; background: rgba(255, 71, 87, 0.05);' : '';
+                const titleAddon = isCancelled ? '<span style="color:#ff4757; font-size: 12px; margin-left:10px;">[АНУЛИРАН]</span>' : '';
+                const btnHTML = isCancelled ? '' : `<button class="del-btn" onclick="cancelOrder('${orderId}', '${order.flightId}')">Анулирай</button>`;
+                
                 list.innerHTML += `
-                    <div class="order-item">
+                    <div class="order-item" style="${statusStyle}">
                         <div>
-                            <div class="f-route">${order.flightFrom} ➔ ${order.flightTo}</div>
+                            <div class="f-route">${order.flightFrom} ➔ ${order.flightTo} ${titleAddon}</div>
                             <div class="f-details">
                                 👤 Клиент: <strong style="color:white;">${order.userEmail}</strong> <br>
                                 📅 Полет: ${order.date} &nbsp;|&nbsp; 
                                 🏷️ Тарифа: ${order.tariff || 'Basic'} &nbsp;|&nbsp; 
+                                ${seatInfo}
                                 💶 Платено: <strong style="color:#2ed573;">${order.price}€</strong>
                             </div>
                         </div>
-                        <button class="del-btn" onclick="cancelOrder('${orderId}', '${order.flightId}')">Анулирай</button>
+                        ${btnHTML}
                     </div>
                 `;
             });
         } catch (e) { list.innerHTML = "Грешка при зареждане."; }
     }
-
    // --- АНУЛИРАНЕ НА ПРОДАДЕН БИЛЕТ (С ОБОСНОВКА) ---
     window.cancelOrder = async (orderId, flightId) => {
         

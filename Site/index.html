@@ -462,94 +462,162 @@
         // ВНИМАНИЕ: ВЕЧЕ НЕ ИЗТРИВАМЕ selectedFlightId тук!
     };
 
-  // --- НОВАТА СИМУЛАЦИЯ НА ПЛАЩАНЕ ---
+    // Глобална променлива, която помни кое място сме избрали в момента
+    window.currentSelectedSeat = null;
+
+    window.clickSeat = (seatName) => {
+        // Връщаме всички свободни места обратно в зелено (за да махнем стария избор)
+        document.querySelectorAll('.seat-box').forEach(el => {
+            if (el.style.backgroundColor !== 'rgb(255, 71, 87)') { // Ако не е червено (заето)
+                el.style.backgroundColor = '#2ed573'; // Правим го зелено
+            }
+        });
+        
+        // Оцветяваме избраното място в синьо
+        document.getElementById('seat-' + seatName).style.backgroundColor = '#667eea';
+        window.currentSelectedSeat = seatName;
+        document.getElementById('selected-seat-display').innerText = seatName;
+    };
+
+  // --- НОВАТА СИМУЛАЦИЯ: ИЗБОР НА МЯСТО -> ПОСЛЕ ПЛАЩАНЕ ---
     window.selectTariff = async (tariffName, extraPrice) => {
         const finalPrice = selectedFlightBasePrice + extraPrice;
-        
-        // 1. ЗАПАЗВАМЕ ID-то на полета ПРЕДИ да затворим модала
         const currentFlightId = selectedFlightId;
         
-        // 2. Затваряме модала с багажа
         closeBaggageModal();
 
-        // 3. Отваряме формата за плащане
-        const { value: formValues } = await Swal.fire({
-            title: 'Детайли за плащане',
-            html: `
-                <div style="text-align:left; background:rgba(255,255,255,0.05); padding:15px; border-radius:10px; margin-bottom:20px;">
-                    <p style="margin:0 0 5px 0; color:#cbd5e1; font-size:14px;">Тарифа: <strong style="color:white;">${tariffName}</strong></p>
-                    <p style="margin:0; color:#cbd5e1; font-size:14px;">Общо за плащане: <strong style="color:#2ed573; font-size:22px;">${finalPrice} €</strong></p>
-                </div>
+       // 1. ВЗИМАМЕ ДАННИТЕ ЗА ПОЛЕТА И СМЯТАМЕ КОЛКО Е ГОЛЯМ САМОЛЕТЪТ
+        let bookedSeats = [];
+        let totalCapacity = 36; // По подразбиране, ако нещо се обърка
+
+        try {
+            const flightSnap = await getDoc(doc(db, "flights", currentFlightId));
+            if (flightSnap.exists()) {
+                const fData = flightSnap.data();
+                if (fData.bookedSeats) bookedSeats = fData.bookedSeats;
                 
-                <input id="swal-cc-name" class="pay-input" placeholder="Имена на картодържател (напр. IVAN IVANOV)" oninput="this.value = this.value.replace(/[^a-zA-Z \s ]/g, '')">
-                
-                <input id="swal-cc-num" class="pay-input" placeholder="Номер на карта (16 цифри)" maxlength="16" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
-                
-                <div style="display:flex; gap:10px;">
-                    <input id="swal-cc-exp" class="pay-input" placeholder="ММ/ГГ" maxlength="5" oninput="
-                        let v = this.value.replace(/[^0-9]/g, ''); 
-                        if (v.length > 2) { v = v.substring(0, 2) + '/' + v.substring(2, 4); } 
-                        this.value = v;
-                    ">
-                    <input id="swal-cc-cvc" class="pay-input" placeholder="CVC" maxlength="3" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
-                </div>
-            `,
-            focusConfirm: false,
+                // Общият брой места в самолета = свободните + вече купените
+                totalCapacity = (fData.seats || 0) + bookedSeats.length; 
+            }
+        } catch (e) { console.error("Грешка при взимане на местата:", e); }
+
+        window.currentSelectedSeat = null; // Нулираме избора
+
+        // Смятаме колко реда ни трябват (разделяме капацитета на 6 места на ред и закръгляме нагоре)
+        const totalRows = Math.ceil(totalCapacity / 6);
+
+        // 2. ДИНАМИЧЕН БРОЙ РЕДОВЕ
+        let seatHTML = `
+            <div style="margin-bottom: 15px;">
+                <span style="display:inline-block; width:15px; height:15px; background:#ff4757; border-radius:3px; margin-right:5px;"></span> Заето
+                <span style="display:inline-block; width:15px; height:15px; background:#2ed573; border-radius:3px; margin-left:10px; margin-right:5px;"></span> Свободно
+                <span style="display:inline-block; width:15px; height:15px; background:#667eea; border-radius:3px; margin-left:10px; margin-right:5px;"></span> Твоето
+            </div>
+            <div style="background: rgba(255,255,255,0.05); padding: 20px; border-radius: 20px; border: 2px solid rgba(255,255,255,0.1); max-width: 320px; margin: 0 auto; max-height: 350px; overflow-y: auto;">
+            <div style="display:grid; grid-template-columns: repeat(7, 1fr); gap: 6px; justify-items: center; align-items: center;">
+        `;
+
+        // Генерираме редовете от 1 до totalRows
+        for(let r = 1; r <= totalRows; r++) {
+            ['A','B','C','-','D','E','F'].forEach(col => {
+                if(col === '-') {
+                    seatHTML += `<div style="width: 20px;"></div>`; // Пътеката в самолета
+                } else {
+                    let seatName = r + col;
+                    let isTaken = bookedSeats.includes(seatName); // Проверяваме дали някой вече го е купил
+                    let color = isTaken ? '#ff4757' : '#2ed573';
+                    let cursor = isTaken ? 'not-allowed' : 'pointer';
+                    let clickAction = isTaken ? '' : `onclick="clickSeat('${seatName}')"`;
+                    
+                    seatHTML += `<div id="seat-${seatName}" class="seat-box" style="background:${color}; width: 35px; height: 35px; border-radius: 8px; cursor:${cursor}; color:white; font-size:12px; display:flex; justify-content:center; align-items:center; font-weight:bold; transition: 0.2s;" ${clickAction}>${seatName}</div>`;
+                }
+            });
+        }
+        seatHTML += `</div></div><p style="margin-top:20px; font-size:18px;">Избрано място: <strong id="selected-seat-display" style="color:#667eea;">Няма</strong></p>`;
+        // 3. ПОКАЗВАМЕ ПРОЗОРЕЦА ЗА ИЗБОР НА МЯСТО
+        const { isConfirmed: seatConfirmed } = await Swal.fire({
+            title: 'Изберете място',
+            html: seatHTML,
             showCancelButton: true,
-            confirmButtonText: 'Плати ' + finalPrice + ' €',
+            confirmButtonText: 'Към плащане',
             cancelButtonText: 'Отказ',
+            background: 'rgba(25, 25, 40, 0.95)', color: 'white',
             preConfirm: () => {
-                const name = document.getElementById('swal-cc-name').value;
-                const num = document.getElementById('swal-cc-num').value;
-                const exp = document.getElementById('swal-cc-exp').value;
-                const cvc = document.getElementById('swal-cc-cvc').value;
-
-                // 1. Проверка дали всичко е попълнено изобщо
-                if (!name.trim() || num.length !== 16 || exp.length !== 5 || cvc.length !== 3) {
-                    Swal.showValidationMessage('Моля, попълнете всички полета коректно!');
+                if(!window.currentSelectedSeat) {
+                    Swal.showValidationMessage('Моля, цъкнете върху зелено място, за да го изберете!');
                     return false;
                 }
-
-                // 2. ПРОВЕРКА ЗА ИЗТЕКЛА КАРТА ИЛИ ГРЕШЕН МЕСЕЦ
-                const [expMonth, expYearShort] = exp.split('/');
-                const expMonthNum = parseInt(expMonth, 10);
-                const expYearNum = parseInt(expYearShort, 10) + 2000; // "26" на "2026"
-
-                const currentDate = new Date();
-                const currentMonth = currentDate.getMonth() + 1; // Месеците почват от 0
-                const currentYear = currentDate.getFullYear();
-
-                // Проверяваме дали месецът е реален (от 01 до 12)
-                if (expMonthNum < 1 || expMonthNum > 12) {
-                    Swal.showValidationMessage('Тази карта не съществува.');
-                    return false;
-                }
-
-                // Проверяваме дали годината е минала ИЛИ сме в същата година, но месецът е минал
-                if (expYearNum < currentYear || (expYearNum === currentYear && expMonthNum < currentMonth)) {
-                    Swal.showValidationMessage('Тази карта е изтекла! Моля, използвайте валидна.');
-                    return false;
-                }
-
-                return true; // Ако мине всички проверки, продължаваме към плащането!
+                return true;
             }
         });
 
-        if (formValues) {
-            // Подаваме запазеното ID към функцията
-            await finalizePurchase(currentFlightId, tariffName, finalPrice);
+        // 4. АКО Е ИЗБРАЛ МЯСТО И Е ЦЪКНАЛ "КЪМ ПЛАЩАНЕ" -> ОТВАРЯМЕ ФОРМАТА ЗА КАРТАТА
+        if (seatConfirmed) {
+            const finalSeat = window.currentSelectedSeat; // Запазваме си избраното място!
+
+            // ТУК Е ТВОЯТ КОД ЗА ПЛАЩАНЕТО (от предишната ти функция)
+            const { value: formValues } = await Swal.fire({
+                title: 'Детайли за плащане',
+                html: `
+                    <div style="text-align:left; background:rgba(255,255,255,0.05); padding:15px; border-radius:10px; margin-bottom:20px;">
+                        <p style="margin:0 0 5px 0; color:#cbd5e1; font-size:14px;">Място: <strong style="color:#667eea; font-size:18px;">${finalSeat}</strong></p>
+                        <p style="margin:0 0 5px 0; color:#cbd5e1; font-size:14px;">Тарифа: <strong style="color:white;">${tariffName}</strong></p>
+                        <p style="margin:0; color:#cbd5e1; font-size:14px;">Общо: <strong style="color:#2ed573; font-size:22px;">${finalPrice} €</strong></p>
+                    </div>
+                    <input id="swal-cc-name" class="pay-input" placeholder="Имена на картодържател (напр. IVAN IVANOV)" oninput="this.value = this.value.replace(/[^a-zA-Z \\s]/g, '')">
+                    <input id="swal-cc-num" class="pay-input" placeholder="Номер на карта (16 цифри)" maxlength="16" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+                    <div style="display:flex; gap:10px;">
+                        <input id="swal-cc-exp" class="pay-input" placeholder="ММ/ГГ" maxlength="5" oninput="
+                            let v = this.value.replace(/[^0-9]/g, ''); 
+                            if (v.length > 2) { v = v.substring(0, 2) + '/' + v.substring(2, 4); } 
+                            this.value = v;
+                        ">
+                        <input id="swal-cc-cvc" class="pay-input" placeholder="CVC" maxlength="3" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+                    </div>
+                `,
+                focusConfirm: false, showCancelButton: true, confirmButtonText: 'Плати ' + finalPrice + ' €',
+                background: 'rgba(25, 25, 40, 0.95)', color: 'white',
+                preConfirm: () => {
+                    const name = document.getElementById('swal-cc-name').value;
+                    const num = document.getElementById('swal-cc-num').value;
+                    const exp = document.getElementById('swal-cc-exp').value;
+                    const cvc = document.getElementById('swal-cc-cvc').value;
+
+                    if (!name.trim() || num.length !== 16 || exp.length !== 5 || cvc.length !== 3) {
+                        Swal.showValidationMessage('Моля, попълнете всички полета коректно!');
+                        return false;
+                    }
+
+                    // Проверка за изтекла карта...
+                    const [expMonth, expYearShort] = exp.split('/');
+                    const expMonthNum = parseInt(expMonth, 10);
+                    const expYearNum = parseInt(expYearShort, 10) + 2000;
+                    const currentDate = new Date();
+                    
+                    if (expMonthNum < 1 || expMonthNum > 12) { Swal.showValidationMessage('Невалиден месец!'); return false; }
+                    if (expYearNum < currentDate.getFullYear() || (expYearNum === currentDate.getFullYear() && expMonthNum < (currentDate.getMonth() + 1))) {
+                        Swal.showValidationMessage('Тази карта е изтекла!'); return false;
+                    }
+                    return true;
+                }
+            });
+
+            if (formValues) {
+                //Тук подаваме и избраното място (finalSeat) към функцията за завършване!
+                await finalizePurchase(currentFlightId, tariffName, finalPrice, finalSeat);
+            }
         }
     };
 
     // --- ФИНАЛИЗИРАНЕ И ЗАПИСВАНЕ В БАЗАТА ---
-    async function finalizePurchase(flightIdToBuy, tariffName, totalPrice) {
+    async function finalizePurchase(flightIdToBuy, tariffName, totalPrice, finalSeat) { // <-- ДОБАВИХМЕ finalSeat ТУК
         UI.loading();
         
         try {
             if (!flightIdToBuy) throw new Error("Системна грешка: Липсва ID на полета!");
 
             const user = auth.currentUser; 
-            const flightRef = doc(db, "flights", flightIdToBuy); // Вече е вътре в try блока
+            const flightRef = doc(db, "flights", flightIdToBuy); 
             
             const flightSnap = await getDoc(flightRef); 
             
@@ -561,7 +629,7 @@
             const f = flightSnap.data();
             
             if (f.seats > 0) {
-                // Добавяне в поръчките
+                // 1. Добавяне в поръчките (ЗАПАЗВАМЕ И МЯСТОТО)
                 await addDoc(collection(db, "orders"), {
                     userId: user.uid, 
                     userEmail: user.email, 
@@ -572,13 +640,21 @@
                     type: f.type || 'oneway', 
                     price: totalPrice, 
                     tariff: tariffName, 
+                    seat: finalSeat, // <--- ЕТО ГО МЯСТОТО (напр. "12A")
                     purchaseDate: new Date().toLocaleDateString()
                 });
                 
-                // Намаляване на местата
-                await updateDoc(flightRef, { seats: f.seats - 1 });
+                // 2. Взимаме досегашните заети места за този полет (или правим празен масив, ако е първият купен билет)
+                const currentBookedSeats = f.bookedSeats || [];
+                currentBookedSeats.push(finalSeat); // Добавяме новото място в списъка с червени места
                 
-                UI.success('Успешно плащане!', 'Билетът е закупен и добавен в профила ви.'); 
+                // 3. Намаляване на бройката места И запазване на заетите места
+                await updateDoc(flightRef, { 
+                    seats: f.seats - 1,
+                    bookedSeats: currentBookedSeats // <--- ПАЗИМ ЗАЕТИТЕ МЕСТА В БАЗАТА
+                });
+                
+                UI.success('Успешно плащане!', `Билетът за място ${finalSeat} е закупен успешно!`); 
                 initApp(); 
                 setTimeout(displayFlights, 500);
             } else { 
@@ -586,7 +662,6 @@
             }
         } catch (error) { 
             console.error(error);
-            // Ако има проблем го спираме 
             UI.error('Възникна проблем', error.message); 
         }
     }
