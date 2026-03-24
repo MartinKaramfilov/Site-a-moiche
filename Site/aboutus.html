@@ -42,7 +42,26 @@
 
         /* ЛЯВА ЧАСТ */
         .nav-left { display: flex; align-items: center; gap: 40px; }
-        .logo { font-size: 26px; font-weight: 700; color: white; text-decoration: none; }
+       /* Нови стилове за логото */
+.logo-container {
+    display: flex;
+    align-items: center; /* Центрира логото и текста вертикално */
+    gap: 10px; /* Добавя разстояние между логото и текста */
+    text-decoration: none; /* Премахва долната черта от контейнера */
+}
+
+.logo-img {
+    height: 35px; /* Регулира височината на логото. Можеш да я промениш по твой вкус */
+    width: auto; /* Запазва съотношението на страните на изображението */
+}
+
+.logo-text {
+    font-size: 24px;
+    font-weight: 700;
+    color: white;
+    letter-spacing: -1px;
+    /* Наследяваме стиловете на старата .logo класа, за да запазим вида на текста */
+}
         .main-menu { display: flex; gap: 25px; }
         .main-menu a { text-decoration: none; color: var(--text-dim); transition: 0.3s; font-weight: 500; font-size: 15px; }
         .main-menu a:hover { color: white; }
@@ -128,7 +147,9 @@
 
 <nav>
     <div class="nav-left">
-        <a href="index.html" class="logo">SkyTickets</a>
+       <a href="index.html" class="logo-container">
+    <img src="/images/logo.png" alt="SkyTickets" class="logo-img">
+    <span class="logo-text">SkyTickets</span>
         <div class="main-menu">
             <a href="index.html">Търсене</a>
             <a href="my-tickets.html">Моите билети</a>

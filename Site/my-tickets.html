@@ -47,7 +47,25 @@
 
         /* ЛЯВА ЧАСТ */
         .nav-left { display: flex; align-items: center; gap: 40px; }
-        .logo { font-size: 26px; font-weight: 700; color: white; text-decoration: none; }
+        .logo-container {
+    display: flex;
+    align-items: center; /* Центрира логото и текста вертикално */
+    gap: 10px; /* Добавя разстояние между логото и текста */
+    text-decoration: none; /* Премахва долната черта от контейнера */
+}
+
+.logo-img {
+    height: 35px; /* Регулира височината на логото. Можеш да я промениш по твой вкус */
+    width: auto; /* Запазва съотношението на страните на изображението */
+}
+
+.logo-text {
+    font-size: 24px;
+    font-weight: 700;
+    color: white;
+    letter-spacing: -1px;
+    /* Наследяваме стиловете на старата .logo класа, за да запазим вида на текста */
+}
         .main-menu { display: flex; gap: 25px; }
         .main-menu a { text-decoration: none; color: var(--text-dim); transition: 0.3s; font-weight: 500; font-size: 15px; }
         .main-menu a:hover { color: white; }
@@ -172,13 +190,83 @@
             .price { margin-bottom: 5px; }
             .qr-box { margin-bottom: 10px; }
         }
+        .site-footer {
+    background-color: rgba(15, 23, 42, 0.95); /* Тъмен цвят, пасващ на темата */
+    color: #cbd5e1; /* Светло сив текст */
+    padding: 60px 0 20px 0;
+    margin-top: 50px; /* Разстояние от съдържанието над него */
+    border-top: 1px solid rgba(255,255,255,0.1);
+    font-family: 'Outfit', sans-serif;
+}
+
+.footer-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+    display: grid;
+    /* Този ред прави магията за телефони - автоматично ги подрежда едно под друго */
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 40px;
+}
+
+.footer-col h3 {
+    color: white;
+    font-size: 24px;
+    margin-bottom: 15px;
+    font-weight: 700;
+}
+
+.footer-col h4 {
+    color: white;
+    font-size: 18px;
+    margin-bottom: 20px;
+    font-weight: 500;
+}
+
+.footer-col p {
+    font-size: 14px;
+    line-height: 1.6;
+    margin-bottom: 10px;
+}
+
+.footer-col ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.footer-col ul li {
+    margin-bottom: 12px;
+}
+
+.footer-col ul li a {
+    color: #cbd5e1;
+    text-decoration: none;
+    font-size: 14px;
+    transition: color 0.3s ease;
+}
+
+.footer-col ul li a:hover {
+    color: #6366f1; /* Твоят син цвят при посочване */
+}
+
+.footer-bottom {
+    text-align: center;
+    padding-top: 30px;
+    margin-top: 40px;
+    border-top: 1px solid rgba(255,255,255,0.05);
+    font-size: 13px;
+    color: #94a3b8;
+}
     </style>
 </head>
 <body>
 
 <nav>
     <div class="nav-left">
-        <a href="index.html" class="logo">SkyTickets</a>
+       <a href="index.html" class="logo-container">
+    <img src="/images/logo.png" alt="SkyTickets" class="logo-img">
+    <span class="logo-text">SkyTickets</span>
         <div class="main-menu">
             <a href="index.html">Търсене</a>
             <a href="my-tickets.html" style="color:white; font-weight:700;">Моите билети</a>
@@ -193,12 +281,49 @@
         <button id="btn-logout" style="display: none;">Изход</button>
     </div>
 </nav>
-
+<main>
 <div class="container">
     <h1>Моите резервации</h1>
     <div id="tickets-container"></div>
 </div>
-<footer><p style="text-align: center; color: var(--text-muted); margin-top: 50px;">&copy; 2026 SkyTickets.</p></footer>
+</main>
+<footer class="site-footer">
+        <div class="footer-container">
+            <div class="footer-col">
+                <img src="/images/logo.png" alt="SkyTickets" class="logo-img">
+                <span class="logo-text">SkyTickets</span>
+                <p>Твоят билет към света. Ние предлагаме най-добрите полети на най-достъпните цени. Пътувай умно, пътувай с нас.</p>
+            </div>
+
+            <div class="footer-col">
+                <h4>За SkyTickets</h4>
+                <ul>
+                    <li><a href="index.html">Начало</a></li>
+                    <li><a href="aboutus.html">За нас</a></li>
+                    <li><a href="my-tickets.html">Моите билети</a></li>
+                    <li><a href="contacts.html">Контакти</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-col">
+                <h4>Начини на плащане</h4>
+                <ul style="pointer-events: none;">
+                    <li> Банков превод</li>
+                </ul>
+            </div>
+
+            <div class="footer-col">
+                <h4>Свържи се с нас</h4>
+                <p>📧 support@skytickets.bg</p>
+                <p>📞 +359 888 123 456</p>
+                <p>📍 гр. Варна, България</p>
+            </div>
+        </div>
+        
+        <div class="footer-bottom">
+            <p>&copy; 2026 SkyTickets. Всички права са запазени.</p>
+        </div>
+    </footer>
 
 <script type="module">
     import { auth, db } from './firebase-config.js';

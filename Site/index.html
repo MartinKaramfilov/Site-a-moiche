@@ -13,6 +13,20 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     
     <style>
+        html, body {
+    height: 100%;
+    margin: 0;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+}
+
+/* Това казва на съдържанието да запълни цялото празно място и да избута футера надолу */
+main {
+    flex: 1; 
+}
         /* Добави това при другите стилове за .flight-card */
 .flight-card {
     /* Променяме леко картата, за да побере снимката */
@@ -96,7 +110,26 @@
         }
 
         .nav-left { display: flex; align-items: center; gap: 40px; }
-        .logo { font-size: 26px; font-weight: 700; color: white; text-decoration: none; }
+        /* Нови стилове за логото */
+.logo-container {
+    display: flex;
+    align-items: center; /* Центрира логото и текста вертикално */
+    gap: 10px; /* Добавя разстояние между логото и текста */
+    text-decoration: none; /* Премахва долната черта от контейнера */
+}
+
+.logo-img {
+    height: 35px; /* Регулира височината на логото. Можеш да я промениш по твой вкус */
+    width: auto; /* Запазва съотношението на страните на изображението */
+}
+
+.logo-text {
+    font-size: 24px;
+    font-weight: 700;
+    color: white;
+    letter-spacing: -1px;
+    /* Наследяваме стиловете на старата .logo класа, за да запазим вида на текста */
+}
         .main-menu { display: flex; gap: 25px; }
         .main-menu a { text-decoration: none; color: var(--text-muted); transition: 0.3s; font-weight: 500; font-size: 15px; }
         .main-menu a:hover { color: white; }
@@ -221,13 +254,84 @@
                 margin-top: 5px;
             }
         }
+        .site-footer {
+    background-color: rgba(15, 23, 42, 0.95); /* Тъмен цвят, пасващ на темата */
+    color: #cbd5e1; /* Светло сив текст */
+    padding: 60px 0 20px 0;
+    margin-top: 50px; /* Разстояние от съдържанието над него */
+    border-top: 1px solid rgba(255,255,255,0.1);
+    font-family: 'Outfit', sans-serif;
+}
+
+.footer-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+    display: grid;
+    /* Този ред прави магията за телефони - автоматично ги подрежда едно под друго */
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 40px;
+}
+
+.footer-col h3 {
+    color: white;
+    font-size: 24px;
+    margin-bottom: 15px;
+    font-weight: 700;
+}
+
+.footer-col h4 {
+    color: white;
+    font-size: 18px;
+    margin-bottom: 20px;
+    font-weight: 500;
+}
+
+.footer-col p {
+    font-size: 14px;
+    line-height: 1.6;
+    margin-bottom: 10px;
+}
+
+.footer-col ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.footer-col ul li {
+    margin-bottom: 12px;
+}
+
+.footer-col ul li a {
+    color: #cbd5e1;
+    text-decoration: none;
+    font-size: 14px;
+    transition: color 0.3s ease;
+}
+
+.footer-col ul li a:hover {
+    color: #6366f1; /* Твоят син цвят при посочване */
+}
+
+.footer-bottom {
+    text-align: center;
+    padding-top: 30px;
+    margin-top: 40px;
+    border-top: 1px solid rgba(255,255,255,0.05);
+    font-size: 13px;
+    color: #94a3b8;
+}
     </style>
 </head>
 <body>
 
 <nav>
     <div class="nav-left">
-        <a href="index.html" class="logo">SkyTickets</a>
+        <a href="index.html" class="logo-container">
+    <img src="/images/logo.png" alt="SkyTickets" class="logo-img">
+    <span class="logo-text">SkyTickets</span>
+</a>
         <div class="main-menu">
             <a href="index.html">Търсене</a>
             <a href="my-tickets.html">Моите билети</a>
@@ -242,7 +346,7 @@
         <button id="btn-logout" style="display: none;">Изход</button>
     </div>
 </nav>
-
+<main>
 <div class="hero">
     <h1>Къде ще летим днес?</h1>
 </div>
@@ -305,8 +409,45 @@
         </div>
     </div>
 </div>
+</main>
+<footer class="site-footer">
+        <div class="footer-container">
+            <div class="footer-col">
+                <img src="/images/logo.png" alt="SkyTickets" class="logo-img">
+                <span class="logo-text">SkyTickets</span>
+                <p>Твоят билет към света. Ние предлагаме най-добрите полети на най-достъпните цени. Пътувай умно, пътувай с нас.</p>
+            </div>
 
-<footer><p style="text-align: center; color: var(--text-muted); margin-top: 50px;">&copy; 2026 SkyTickets.</p></footer>
+            <div class="footer-col">
+                <h4>За SkyTickets</h4>
+                <ul>
+                    <li><a href="index.html">Начало</a></li>
+                    <li><a href="aboutus.html">За нас</a></li>
+                    <li><a href="my-tickets.html">Моите билети</a></li>
+                    <li><a href="contacts.html">Контакти</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-col">
+                <h4>Начини на плащане</h4>
+                <ul style="pointer-events: none;">
+                    <li> Банков превод</li>
+                </ul>
+            </div>
+
+            <div class="footer-col">
+                <h4>Свържи се с нас</h4>
+                <p>📧 support@skytickets.bg</p>
+                <p>📞 +359 888 123 456</p>
+                <p>📍 гр. Варна, България</p>
+            </div>
+        </div>
+        
+        <div class="footer-bottom">
+            <p>&copy; 2026 SkyTickets. Всички права са запазени.</p>
+        </div>
+    </footer>
+
 
 <script type="module">
     import { auth, db } from './firebase-config.js';
@@ -457,155 +598,188 @@
         document.getElementById('baggage-modal').style.display = 'flex';
     };
     
-    window.closeBaggageModal = () => { 
+window.closeBaggageModal = () => { 
         document.getElementById('baggage-modal').style.display = 'none'; 
-        // ВНИМАНИЕ: ВЕЧЕ НЕ ИЗТРИВАМЕ selectedFlightId тук!
     };
 
-    // Глобална променлива, която помни кое място сме избрали в момента
     window.currentSelectedSeat = null;
 
+    // ОБНОВЕНА clickSeat функция, която поддържа новите цветове
     window.clickSeat = (seatName) => {
-        // Връщаме всички свободни места обратно в зелено (за да махнем стария избор)
         document.querySelectorAll('.seat-box').forEach(el => {
-            if (el.style.backgroundColor !== 'rgb(255, 71, 87)') { // Ако не е червено (заето)
-                el.style.backgroundColor = '#2ed573'; // Правим го зелено
+            // Връщаме цвета само ако не е заето (червено) и не е заключено (за Smart)
+            if (el.style.backgroundColor !== 'rgb(255, 71, 87)' && el.dataset.locked !== 'true') {
+                el.style.backgroundColor = el.dataset.originalColor || '#2ed573';
             }
         });
         
-        // Оцветяваме избраното място в синьо
-        document.getElementById('seat-' + seatName).style.backgroundColor = '#667eea';
-        window.currentSelectedSeat = seatName;
-        document.getElementById('selected-seat-display').innerText = seatName;
+        const selectedEl = document.getElementById('seat-' + seatName);
+        if (selectedEl && selectedEl.dataset.locked !== 'true') {
+            selectedEl.style.backgroundColor = '#667eea';
+            window.currentSelectedSeat = seatName;
+            const display = document.getElementById('selected-seat-display');
+            if(display) display.innerText = seatName;
+        }
     };
 
-  // --- НОВАТА СИМУЛАЦИЯ: ИЗБОР НА МЯСТО -> ПОСЛЕ ПЛАЩАНЕ ---
+    // ОБНОВЕНА selectTariff функция (Всичко в едно, както беше при теб)
     window.selectTariff = async (tariffName, extraPrice) => {
         const finalPrice = selectedFlightBasePrice + extraPrice;
         const currentFlightId = selectedFlightId;
         
-        closeBaggageModal();
+        window.closeBaggageModal();
 
-       // 1. ВЗИМАМЕ ДАННИТЕ ЗА ПОЛЕТА И СМЯТАМЕ КОЛКО Е ГОЛЯМ САМОЛЕТЪТ
+        // 1. Взимаме данните за полета
         let bookedSeats = [];
-        let totalCapacity = 36; // По подразбиране, ако нещо се обърка
+        let totalCapacity = 36;
 
         try {
+            // ЗАБЕЛЕЖКА: Увери се, че най-отгоре в скрипта имаш импортирани doc и getDoc!
             const flightSnap = await getDoc(doc(db, "flights", currentFlightId));
             if (flightSnap.exists()) {
                 const fData = flightSnap.data();
                 if (fData.bookedSeats) bookedSeats = fData.bookedSeats;
-                
-                // Общият брой места в самолета = свободните + вече купените
                 totalCapacity = (fData.seats || 0) + bookedSeats.length; 
             }
         } catch (e) { console.error("Грешка при взимане на местата:", e); }
 
-        window.currentSelectedSeat = null; // Нулираме избора
-
-        // Смятаме колко реда ни трябват (разделяме капацитета на 6 места на ред и закръгляме нагоре)
+        window.currentSelectedSeat = null;
         const totalRows = Math.ceil(totalCapacity / 6);
+       // Пресмятаме 25% от общия брой редове (закръглено надолу), но винаги гарантираме поне 1 премиум ред
+const premiumRows = Math.max(1, Math.floor(totalRows * 0.25));
 
-        // 2. ДИНАМИЧЕН БРОЙ РЕДОВЕ
-        let seatHTML = `
-            <div style="margin-bottom: 15px;">
-                <span style="display:inline-block; width:15px; height:15px; background:#ff4757; border-radius:3px; margin-right:5px;"></span> Заето
-                <span style="display:inline-block; width:15px; height:15px; background:#2ed573; border-radius:3px; margin-left:10px; margin-right:5px;"></span> Свободно
-                <span style="display:inline-block; width:15px; height:15px; background:#667eea; border-radius:3px; margin-left:10px; margin-right:5px;"></span> Твоето
-            </div>
-            <div style="background: rgba(255,255,255,0.05); padding: 20px; border-radius: 20px; border: 2px solid rgba(255,255,255,0.1); max-width: 320px; margin: 0 auto; max-height: 350px; overflow-y: auto;">
-            <div style="display:grid; grid-template-columns: repeat(7, 1fr); gap: 6px; justify-items: center; align-items: center;">
-        `;
+        let finalSeatToBuy = null;
 
-        // Генерираме редовете от 1 до totalRows
-        for(let r = 1; r <= totalRows; r++) {
-            ['A','B','C','-','D','E','F'].forEach(col => {
-                if(col === '-') {
-                    seatHTML += `<div style="width: 20px;"></div>`; // Пътеката в самолета
-                } else {
-                    let seatName = r + col;
-                    let isTaken = bookedSeats.includes(seatName); // Проверяваме дали някой вече го е купил
-                    let color = isTaken ? '#ff4757' : '#2ed573';
-                    let cursor = isTaken ? 'not-allowed' : 'pointer';
-                    let clickAction = isTaken ? '' : `onclick="clickSeat('${seatName}')"`;
-                    
-                    seatHTML += `<div id="seat-${seatName}" class="seat-box" style="background:${color}; width: 35px; height: 35px; border-radius: 8px; cursor:${cursor}; color:white; font-size:12px; display:flex; justify-content:center; align-items:center; font-weight:bold; transition: 0.2s;" ${clickAction}>${seatName}</div>`;
-                }
-            });
-        }
-        seatHTML += `</div></div><p style="margin-top:20px; font-size:18px;">Избрано място: <strong id="selected-seat-display" style="color:#667eea;">Няма</strong></p>`;
-        // 3. ПОКАЗВАМЕ ПРОЗОРЕЦА ЗА ИЗБОР НА МЯСТО
-        const { isConfirmed: seatConfirmed } = await Swal.fire({
-            title: 'Изберете място',
-            html: seatHTML,
-            showCancelButton: true,
-            confirmButtonText: 'Към плащане',
-            cancelButtonText: 'Отказ',
-            background: 'rgba(25, 25, 40, 0.95)', color: 'white',
-            preConfirm: () => {
-                if(!window.currentSelectedSeat) {
-                    Swal.showValidationMessage('Моля, цъкнете върху зелено място, за да го изберете!');
-                    return false;
-                }
-                return true;
+        // --- 2А. ЛОГИКА ЗА BASIC (Без карта, рандом място) ---
+        if (tariffName === 'Basic') {
+            let freeSeats = [];
+            for(let r = 1; r <= totalRows; r++) {
+                ['A','B','C','D','E','F'].forEach(col => {
+                    let sName = r + col;
+                    if(!bookedSeats.includes(sName)) freeSeats.push(sName);
+                });
             }
-        });
+            
+            if(freeSeats.length === 0) {
+                Swal.fire('Грешка', 'Няма свободни места!', 'error'); 
+                return;
+            }
+            finalSeatToBuy = freeSeats[Math.floor(Math.random() * freeSeats.length)];
+        } 
+        // --- 2Б. ЛОГИКА ЗА SMART и PLUS (Показва картата) ---
+        else {
+            let seatHTML = `
+                <div style="margin-bottom: 15px; font-size: 13px;">
+                    <span style="display:inline-block; width:12px; height:12px; background:#ff4757; border-radius:3px;"></span> Заето
+                    <span style="display:inline-block; width:12px; height:12px; background:#2ed573; border-radius:3px; margin-left:8px;"></span> Стандарт
+                    <span style="display:inline-block; width:12px; height:12px; background:#f1c40f; border-radius:3px; margin-left:8px;"></span> Премиум
+                    <span style="display:inline-block; width:12px; height:12px; background:#667eea; border-radius:3px; margin-left:8px;"></span> Твоето
+                </div>
+                <div style="background: rgba(255,255,255,0.05); padding: 20px; border-radius: 20px; border: 2px solid rgba(255,255,255,0.1); max-width: 320px; margin: 0 auto; max-height: 350px; overflow-y: auto;">
+                <div style="display:grid; grid-template-columns: repeat(7, 1fr); gap: 6px; justify-items: center; align-items: center;">
+            `;
 
-        // 4. АКО Е ИЗБРАЛ МЯСТО И Е ЦЪКНАЛ "КЪМ ПЛАЩАНЕ" -> ОТВАРЯМЕ ФОРМАТА ЗА КАРТАТА
-        if (seatConfirmed) {
-            const finalSeat = window.currentSelectedSeat; // Запазваме си избраното място!
+            for(let r = 1; r <= totalRows; r++) {
+                ['A','B','C','-','D','E','F'].forEach(col => {
+                    if(col === '-') {
+                        seatHTML += `<div style="width: 20px;"></div>`; 
+                    } else {
+                        let seatName = r + col;
+                        let isTaken = bookedSeats.includes(seatName);
+                        let isPremium = (r <= premiumRows);
+                        
+                        let color = '#2ed573';
+                        let cursor = 'pointer';
+                        let clickAction = `onclick="window.clickSeat('${seatName}')"`;
+                        let extraData = `data-original-color="#2ed573"`;
 
-            // ТУК Е ТВОЯТ КОД ЗА ПЛАЩАНЕТО (от предишната ти функция)
-            const { value: formValues } = await Swal.fire({
-                title: 'Детайли за плащане',
-                html: `
-                    <div style="text-align:left; background:rgba(255,255,255,0.05); padding:15px; border-radius:10px; margin-bottom:20px;">
-                        <p style="margin:0 0 5px 0; color:#cbd5e1; font-size:14px;">Място: <strong style="color:#667eea; font-size:18px;">${finalSeat}</strong></p>
-                        <p style="margin:0 0 5px 0; color:#cbd5e1; font-size:14px;">Тарифа: <strong style="color:white;">${tariffName}</strong></p>
-                        <p style="margin:0; color:#cbd5e1; font-size:14px;">Общо: <strong style="color:#2ed573; font-size:22px;">${finalPrice} €</strong></p>
-                    </div>
-                    <input id="swal-cc-name" class="pay-input" placeholder="Имена на картодържател (напр. IVAN IVANOV)" oninput="this.value = this.value.replace(/[^a-zA-Z \\s]/g, '')">
-                    <input id="swal-cc-num" class="pay-input" placeholder="Номер на карта (16 цифри)" maxlength="16" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
-                    <div style="display:flex; gap:10px;">
-                        <input id="swal-cc-exp" class="pay-input" placeholder="ММ/ГГ" maxlength="5" oninput="
-                            let v = this.value.replace(/[^0-9]/g, ''); 
-                            if (v.length > 2) { v = v.substring(0, 2) + '/' + v.substring(2, 4); } 
-                            this.value = v;
-                        ">
-                        <input id="swal-cc-cvc" class="pay-input" placeholder="CVC" maxlength="3" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
-                    </div>
-                `,
-                focusConfirm: false, showCancelButton: true, confirmButtonText: 'Плати ' + finalPrice + ' €',
+                        if (isTaken) {
+                            color = '#ff4757'; cursor = 'not-allowed'; clickAction = ''; extraData = '';
+                        } else if (isPremium) {
+                            color = '#f1c40f'; // Жълти премиум места
+                            extraData = `data-original-color="#f1c40f"`;
+                            if (tariffName === 'Smart') {
+                                cursor = 'not-allowed';
+                                extraData += ` data-locked="true"`;
+                                // Ако цъкне заключено място, текстът отдолу се променя:
+                                clickAction = `onclick="document.getElementById('selected-seat-display').innerHTML = '<span style=\\'color:#ff4757;\\'>Премиум са само за PLUS!</span>'"`;
+                            }
+                        }
+                        
+                        seatHTML += `<div id="seat-${seatName}" class="seat-box" ${extraData} style="background:${color}; width: 35px; height: 35px; border-radius: 8px; cursor:${cursor}; color:white; font-size:12px; display:flex; justify-content:center; align-items:center; font-weight:bold; transition: 0.2s;" ${clickAction}>${seatName}</div>`;
+                    }
+                });
+            }
+            seatHTML += `</div></div><p style="margin-top:20px; font-size:18px;">Избрано място: <strong id="selected-seat-display" style="color:#667eea;">Няма</strong></p>`;
+
+            const { isConfirmed: seatConfirmed } = await Swal.fire({
+                title: 'Изберете място',
+                html: seatHTML,
+                showCancelButton: true,
+                confirmButtonText: 'Към плащане',
+                cancelButtonText: 'Отказ',
                 background: 'rgba(25, 25, 40, 0.95)', color: 'white',
                 preConfirm: () => {
-                    const name = document.getElementById('swal-cc-name').value;
-                    const num = document.getElementById('swal-cc-num').value;
-                    const exp = document.getElementById('swal-cc-exp').value;
-                    const cvc = document.getElementById('swal-cc-cvc').value;
-
-                    if (!name.trim() || num.length !== 16 || exp.length !== 5 || cvc.length !== 3) {
-                        Swal.showValidationMessage('Моля, попълнете всички полета коректно!');
+                    if(!window.currentSelectedSeat) {
+                        Swal.showValidationMessage('Моля, изберете позволено място!');
                         return false;
-                    }
-
-                    // Проверка за изтекла карта...
-                    const [expMonth, expYearShort] = exp.split('/');
-                    const expMonthNum = parseInt(expMonth, 10);
-                    const expYearNum = parseInt(expYearShort, 10) + 2000;
-                    const currentDate = new Date();
-                    
-                    if (expMonthNum < 1 || expMonthNum > 12) { Swal.showValidationMessage('Невалиден месец!'); return false; }
-                    if (expYearNum < currentDate.getFullYear() || (expYearNum === currentDate.getFullYear() && expMonthNum < (currentDate.getMonth() + 1))) {
-                        Swal.showValidationMessage('Тази карта е изтекла!'); return false;
                     }
                     return true;
                 }
             });
 
-            if (formValues) {
-                //Тук подаваме и избраното място (finalSeat) към функцията за завършване!
-                await finalizePurchase(currentFlightId, tariffName, finalPrice, finalSeat);
+            if (!seatConfirmed) return; // Ако натисне "Отказ", спираме дотук
+            finalSeatToBuy = window.currentSelectedSeat;
+        }
+
+        // --- 3. ПОКАЗВАМЕ ФОРМАТА ЗА ПЛАЩАНЕ (И за Basic, и за другите) ---
+        const { value: formValues } = await Swal.fire({
+            title: 'Детайли за плащане',
+            html: `
+                <div style="text-align:left; background:rgba(255,255,255,0.05); padding:15px; border-radius:10px; margin-bottom:20px;">
+                    <p style="margin:0 0 5px 0; color:#cbd5e1; font-size:14px;">Място: <strong style="color:#667eea; font-size:18px;">${finalSeatToBuy}</strong> ${tariffName === 'Basic' ? '<span style="font-size:12px; color:#94a3b8;">(Случайно)</span>' : ''}</p>
+                    <p style="margin:0 0 5px 0; color:#cbd5e1; font-size:14px;">Тарифа: <strong style="color:white;">${tariffName}</strong></p>
+                    <p style="margin:0; color:#cbd5e1; font-size:14px;">Общо: <strong style="color:#2ed573; font-size:22px;">${finalPrice} €</strong></p>
+                </div>
+                <input id="swal-cc-name" class="pay-input" placeholder="Имена на картодържател (напр. IVAN IVANOV)" oninput="this.value = this.value.replace(/[^a-zA-Z \\s]/g, '')">
+                <input id="swal-cc-num" class="pay-input" placeholder="Номер на карта (16 цифри)" maxlength="16" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+                <div style="display:flex; gap:10px;">
+                    <input id="swal-cc-exp" class="pay-input" placeholder="ММ/ГГ" maxlength="5" oninput="
+                        let v = this.value.replace(/[^0-9]/g, ''); 
+                        if (v.length > 2) { v = v.substring(0, 2) + '/' + v.substring(2, 4); } 
+                        this.value = v;
+                    ">
+                    <input id="swal-cc-cvc" class="pay-input" placeholder="CVC" maxlength="3" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+                </div>
+            `,
+            focusConfirm: false, showCancelButton: true, confirmButtonText: 'Плати ' + finalPrice + ' €',
+            background: 'rgba(25, 25, 40, 0.95)', color: 'white',
+            preConfirm: () => {
+                const name = document.getElementById('swal-cc-name').value;
+                const num = document.getElementById('swal-cc-num').value;
+                const exp = document.getElementById('swal-cc-exp').value;
+                const cvc = document.getElementById('swal-cc-cvc').value;
+
+                if (!name.trim() || num.length !== 16 || exp.length !== 5 || cvc.length !== 3) {
+                    Swal.showValidationMessage('Моля, попълнете всички полета коректно!'); return false;
+                }
+
+                const [expMonth, expYearShort] = exp.split('/');
+                const expMonthNum = parseInt(expMonth, 10);
+                const expYearNum = parseInt(expYearShort, 10) + 2000;
+                const currentDate = new Date();
+                
+                if (expMonthNum < 1 || expMonthNum > 12) { Swal.showValidationMessage('Невалиден месец!'); return false; }
+                if (expYearNum < currentDate.getFullYear() || (expYearNum === currentDate.getFullYear() && expMonthNum < (currentDate.getMonth() + 1))) {
+                    Swal.showValidationMessage('Тази карта е изтекла!'); return false;
+                }
+                return true;
             }
+        });
+
+        // 4. ЗАВЪРШВАНЕ НА ПОКУПКАТА
+        if (formValues) {
+            await finalizePurchase(currentFlightId, tariffName, finalPrice, finalSeatToBuy);
         }
     };
 
