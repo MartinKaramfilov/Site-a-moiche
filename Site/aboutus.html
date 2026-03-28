@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>За нас | SkyTickets</title>
+    <title>За нас | SkyTickets</title>  
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -30,7 +30,7 @@
             100% { background-position: 0% 50%; }
         }
 
-        /*НОВАТА РАЗДЕЛЕНА НАВИГАЦИЯ*/
+        /* --- НАВИГАЦИЯ --- */
         nav { 
             background: rgba(15, 12, 41, 0.6);
             backdrop-filter: blur(12px);
@@ -40,37 +40,19 @@
             position: sticky; top: 0; z-index: 100;
         }
 
-        /* ЛЯВА ЧАСТ */
         .nav-left { display: flex; align-items: center; gap: 40px; }
-       /* Нови стилове за логото */
-.logo-container {
-    display: flex;
-    align-items: center; /* Центрира логото и текста вертикално */
-    gap: 10px; /* Добавя разстояние между логото и текста */
-    text-decoration: none; /* Премахва долната черта от контейнера */
-}
+        
+        /* Лого */
+        .logo-container { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+        .logo-img { height: 35px; width: auto; object-fit: contain; }
+        .logo-text { font-size: 26px; font-weight: 700; color: white; letter-spacing: -1px; }
 
-.logo-img {
-    height: 35px; /* Регулира височината на логото. Можеш да я промениш по твой вкус */
-    width: auto; /* Запазва съотношението на страните на изображението */
-}
-
-.logo-text {
-    font-size: 24px;
-    font-weight: 700;
-    color: white;
-    letter-spacing: -1px;
-    /* Наследяваме стиловете на старата .logo класа, за да запазим вида на текста */
-}
         .main-menu { display: flex; gap: 25px; }
         .main-menu a { text-decoration: none; color: var(--text-dim); transition: 0.3s; font-weight: 500; font-size: 15px; }
         .main-menu a:hover { color: white; }
 
-        /* ДЯСНА ЧАСТ */
         .nav-right { display: flex; align-items: center; gap: 20px; }
         #user-display { font-size: 14px; }
-        
-        /* Бутон Изход */
         #btn-logout {
             background: rgba(255, 71, 87, 0.2); color: #ff4757; 
             border: 1px solid #ff4757; padding: 6px 18px; 
@@ -78,9 +60,8 @@
         }
         #btn-logout:hover { background: #ff4757; color: white; }
 
-        /*СЪДЪРЖАНИЕ*/
+        /* --- СЪДЪРЖАНИЕ ЗА НАС --- */
         .container { max-width: 1000px; margin: 60px auto; padding: 0 20px; }
-
         h1 { font-size: 42px; text-align: center; margin-bottom: 40px; text-shadow: 0 0 20px rgba(165, 180, 252, 0.5); }
         h2 { font-size: 28px; margin-bottom: 20px; color: #a5b4fc; }
         p { line-height: 1.6; color: var(--text-dim); font-size: 18px; margin-bottom: 20px; }
@@ -100,46 +81,64 @@
         .feature-title { font-weight: 700; font-size: 20px; margin-bottom: 10px; color: white; }
         .feature-desc { font-size: 14px; color: var(--text-dim); }
 
-        footer { text-align: center; color: var(--text-dim); padding: 40px 0; font-size: 14px; border-top: 1px solid var(--border); margin-top: 60px; }
+        /* --- ФУТЕР --- */
+        .site-footer {
+            background-color: rgba(15, 23, 42, 0.95);
+            color: #cbd5e1;
+            padding: 60px 0 20px 0;
+            margin-top: 60px;
+            border-top: 1px solid var(--border);
+            width: 100%;
+            font-family: 'Outfit', sans-serif;
+        }
+        .site-footer .footer-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 40px;
+            box-sizing: border-box;
+        }
+        .site-footer .footer-col h3 { color: white; font-size: 24px; margin-bottom: 15px; font-weight: 700; text-align: left; }
+        .site-footer .footer-col h4 { color: white; font-size: 18px; margin-bottom: 20px; font-weight: 500; text-align: left; }
+        .site-footer .footer-col p { font-size: 14px; line-height: 1.6; margin-bottom: 10px; color: #cbd5e1; text-align: left; }
+        
+        /* Изчистване на отместването на списъците - тук е фиксът! */
+        .site-footer .footer-col ul { 
+            list-style: none !important; 
+            padding: 0 !important; 
+            margin: 0 !important; 
+            text-align: left !important; 
+        }
+        .site-footer .footer-col ul li { 
+            margin-bottom: 12px !important; 
+            padding-left: 0 !important;
+        }
+        .site-footer .footer-col ul li a { color: #cbd5e1; text-decoration: none; font-size: 14px; transition: 0.3s; }
+        .site-footer .footer-col ul li a:hover { color: #667eea; }
+
+        .site-footer .footer-bottom {
+            text-align: center;
+            padding-top: 30px;
+            margin-top: 40px;
+            border-top: 1px solid rgba(255,255,255,0.05);
+        }
+        .site-footer .footer-bottom p {
+            font-size: 13px;
+            color: #94a3b8;
+            margin: 0;
+            text-align: center;
+        }
+
+        /* --- МОБИЛНА ВЕРСИЯ --- */
         @media (max-width: 950px) {
-            /* 1. ОПРАВЯМЕ МЕНЮТО */
-            nav { 
-                flex-direction: column !important; 
-                height: auto !important; 
-                padding: 15px !important; 
-                gap: 15px !important; 
-            }
+            nav { flex-direction: column !important; height: auto !important; padding: 15px !important; gap: 15px !important; }
             .nav-left { flex-direction: column !important; gap: 15px !important; width: 100% !important; }
             .main-menu { flex-wrap: wrap !important; justify-content: center !important; gap: 15px !important; font-size: 15px !important; }
             .nav-right { width: 100% !important; justify-content: center !important; flex-wrap: wrap !important; gap: 10px !important; }
-
-            /* 2. ОСНОВНИЯТ КОНТЕЙНЕР */
-            .container, .about-container {
-                width: 100% !important;
-                padding: 15px !important;
-                margin: 20px auto !important;
-                box-sizing: border-box !important;
-            }
-
-            /* 3. КУТИИТЕ С ТЕКСТ ИЛИ СНИМКИ */
-            /* Ако имаш две колони (напр. текст вляво, снимка вдясно), това ги слага една под друга */
-            .glass-panel, .info-box, .about-content, .team-grid {
-                display: flex !important;
-                flex-direction: column !important;
-                width: 100% !important;
-                max-width: 100% !important;
-                padding: 20px !important;
-                box-sizing: border-box !important;
-                margin-bottom: 20px !important;
-            }
-
-            /* 4. ОПРАВЯМЕ СНИМКИТЕ (ДА НЕ ИЗЛИЗАТ ОТ ЕКРАНА) */
-            .container img, .glass-panel img {
-                max-width: 100% !important;
-                height: auto !important;
-                border-radius: 15px !important;
-                margin-bottom: 15px !important;
-            }
+            .container { width: 100% !important; padding: 15px !important; margin: 20px auto !important; box-sizing: border-box !important; }
+            .site-footer .footer-container { gap: 30px !important; }
         }
     </style>
 </head>
@@ -198,9 +197,43 @@
     </div>
 </div>
 
-<footer>
-    &copy; 2026 SkyTickets.
-</footer>
+<footer class="site-footer">
+        <div class="footer-container">
+            <div class="footer-col">
+                <img src="/images/logo.png" alt="SkyTickets" class="logo-img">
+                <span class="logo-text">SkyTickets</span>
+                <p>Твоят билет към света. Ние предлагаме най-добрите полети на най-достъпните цени. Пътувай умно, пътувай с нас.</p>
+            </div>
+
+            <div class="footer-col">
+                <h4>За SkyTickets</h4>
+                <ul>
+                    <li><a href="index.html">Начало</a></li>
+                    <li><a href="aboutus.html">За нас</a></li>
+                    <li><a href="my-tickets.html">Моите билети</a></li>
+                    <li><a href="contacts.html">Контакти</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-col">
+                <h4>Начини на плащане</h4>
+                <ul style="pointer-events: none;">
+                    <li> Банков превод</li>
+                </ul>
+            </div>
+
+            <div class="footer-col">
+                <h4>Свържи се с нас</h4>
+                <p>📧 support@skytickets.bg</p>
+                <p>📞 +359 888 123 456</p>
+                <p>📍 гр. Варна, България</p>
+            </div>
+        </div>
+        
+        <div class="footer-bottom">
+            <p>&copy; 2026 SkyTickets. Всички права са запазени.</p>
+        </div>
+    </footer>
 
 <script type="module">
     import { auth, db } from './firebase-config.js';

@@ -13,20 +13,7 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     
     <style>
-        html, body {
-    height: 100%;
-    margin: 0;
-}
-
-body {
-    display: flex;
-    flex-direction: column;
-}
-
-/* Това казва на съдържанието да запълни цялото празно място и да избута футера надолу */
-main {
-    flex: 1; 
-}
+        
         /* Добави това при другите стилове за .flight-card */
 .flight-card {
     /* Променяме леко картата, за да побере снимката */
@@ -110,17 +97,19 @@ main {
         }
 
         .nav-left { display: flex; align-items: center; gap: 40px; }
-        /* Нови стилове за логото */
+        
+  /* --- СТИЛОВЕ ЗА ЛОГОТО --- */
 .logo-container {
     display: flex;
-    align-items: center; /* Центрира логото и текста вертикално */
-    gap: 10px; /* Добавя разстояние между логото и текста */
-    text-decoration: none; /* Премахва долната черта от контейнера */
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
 }
 
 .logo-img {
-    height: 35px; /* Регулира височината на логото. Можеш да я промениш по твой вкус */
-    width: auto; /* Запазва съотношението на страните на изображението */
+    height: 40px; /* ТОВА Е НАЙ-ВАЖНОТО - смалява картинката! */
+    width: auto;
+    object-fit: contain;
 }
 
 .logo-text {
@@ -128,7 +117,6 @@ main {
     font-weight: 700;
     color: white;
     letter-spacing: -1px;
-    /* Наследяваме стиловете на старата .logo класа, за да запазим вида на текста */
 }
         .main-menu { display: flex; gap: 25px; }
         .main-menu a { text-decoration: none; color: var(--text-muted); transition: 0.3s; font-weight: 500; font-size: 15px; }
@@ -254,7 +242,7 @@ main {
                 margin-top: 5px;
             }
         }
-        .site-footer {
+       .site-footer {
     background-color: rgba(15, 23, 42, 0.95); /* Тъмен цвят, пасващ на темата */
     color: #cbd5e1; /* Светло сив текст */
     padding: 60px 0 20px 0;
@@ -322,6 +310,7 @@ main {
     font-size: 13px;
     color: #94a3b8;
 }
+
     </style>
 </head>
 <body>
@@ -331,7 +320,7 @@ main {
         <a href="index.html" class="logo-container">
     <img src="/images/logo.png" alt="SkyTickets" class="logo-img">
     <span class="logo-text">SkyTickets</span>
-</a>
+        </a>
         <div class="main-menu">
             <a href="index.html">Търсене</a>
             <a href="my-tickets.html">Моите билети</a>
@@ -410,6 +399,7 @@ main {
     </div>
 </div>
 </main>
+
 <footer class="site-footer">
         <div class="footer-container">
             <div class="footer-col">
@@ -447,7 +437,6 @@ main {
             <p>&copy; 2026 SkyTickets. Всички права са запазени.</p>
         </div>
     </footer>
-
 
 <script type="module">
     import { auth, db } from './firebase-config.js';
