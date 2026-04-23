@@ -586,7 +586,7 @@
         // 2. Ако админът е написал причина и е цъкнал "Анулирай"
         if (cancelReason) {
             try {
-                // Връщаме 1 място обратно в полета (както си беше и досега)
+                // Връщаме 1 място обратно в полета 
                 const flightRef = doc(db, "flights", flightId);
                 const flightSnap = await getDoc(flightRef);
                 
