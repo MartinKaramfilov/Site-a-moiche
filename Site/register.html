@@ -163,7 +163,7 @@
     <div class="form-row">
 
     <input type="text" id="reg-zip" placeholder="Пощенски код" maxlength="4" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
-    <input type="tel" id="phone" placeholder="Телефон">
+    <input type="tel" id="phone" placeholder="Телефон" maxlength="15" oninput="this.value = this.value.replace(/[^0-9+]/g, '')">
     </div>
 
    <input type="email" id="email" placeholder="Имейл адрес" style="margin-bottom: 15px;" oninput="this.value = this.value.replace(/[^a-zA-Z0-9@._-]/g, '')">
