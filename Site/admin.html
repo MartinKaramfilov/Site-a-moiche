@@ -282,7 +282,7 @@
             </div>
             <div class="form-group">
                 <label>Места</label>
-                <input type="number" id="f-seats" placeholder="100">
+                <input type="number" id="f-seats" min="6" max="900" class="pay-input" placeholder="Брой места" oninput="if(this.value > 900) this.value = 900;">
             </div>
         </div>
         <div class="form-group" style="margin-top: 10px;">
